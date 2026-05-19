@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type { fabric } from "fabric";
 import { useEditor } from "@/features/editor/hooks/use-editor";
-import type { EditorCanvas, FabricNamespace } from "@/features/editor/types";
 
 export const Editor = () => {
   const { init } = useEditor();
@@ -12,19 +12,20 @@ export const Editor = () => {
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current) return;
 
-    let canvas: EditorCanvas | undefined;
+    let canvas: fabric.Canvas | undefined;
 
-    void import("fabric").then(({ fabric }) => {
-      const fabricCanvas = new fabric.Canvas(canvasRef.current!, {
-        controlsAboveOverlay: true,
-        preserveObjectStacking: true,
-      });
-      canvas = fabricCanvas as EditorCanvas;
+    void import("fabric").then(async ({ fabric }) => {
+      const { setupEditor } = await import("@/features/editor/lib/setup-editor");
+      const fabricCanvas = setupEditor(
+        fabric,
+        canvasRef.current!,
+        containerRef.current!,
+      );
+      canvas = fabricCanvas;
 
       init({
-        initialCanvas: fabricCanvas as EditorCanvas,
-        initialContainer: containerRef.current!,
-        fabric: fabric as unknown as FabricNamespace,
+        canvas: fabricCanvas,
+        container: containerRef.current!,
       });
     });
 
@@ -33,7 +34,6 @@ export const Editor = () => {
     };
   }, [init]);
 
-
   return (
     <div className="h-full flex flex-col">
       <div className="h-full flex-1 bg-muted" ref={containerRef}>
@@ -41,4 +41,4 @@ export const Editor = () => {
       </div>
     </div>
   );
-}
+};

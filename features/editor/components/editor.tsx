@@ -36,7 +36,8 @@ export const Editor = () => {
     setActiveTool(tool);
   }, [activeTool]);
 
-  const { init } = useEditor();
+  //拿到画布初始化函数和编辑器实例
+  const { init, editor } = useEditor();
   const containerRef = useRef<HTMLDivElement>(null);
 
   // 组件挂载后执行一次「初始化画布」；卸载或依赖变化时执行 return 里的清理
@@ -98,6 +99,7 @@ export const Editor = () => {
           onChangeActiveTool={onChangeActiveTool}>
         </Sidebar>
         <ShapeSidebar
+          editor={editor}
           activeTool={activeTool}
           onChangeActiveTool={onChangeActiveTool}>
         </ShapeSidebar>

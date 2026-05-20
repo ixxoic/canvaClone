@@ -41,13 +41,5 @@ export function setupEditor(
   canvas.centerObject(initialWorkspace);
   canvas.clipPath = initialWorkspace;
 
-  const test = new fabric.Rect({
-    height: 100,
-    width: 100,
-    fill: "black",
-  });
-  canvas.add(test);
-  canvas.centerObject(test);
-
   return canvas;
 }

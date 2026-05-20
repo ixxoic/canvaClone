@@ -1,6 +1,8 @@
 "use client";
 
 import { Logo } from "@/features/editor/components/logo";
+import { ActiveTool } from "../types";
+import { cn } from "@/lib/utils";
 import { ChevronDown, Download, MousePointerClick, Redo2, Undo2 } from "lucide-react";
 import { CiFileOn } from "react-icons/ci";
 import { BsCloudCheck } from "react-icons/bs";
@@ -14,7 +16,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export const Navbar = () => {
+interface NavbarProps {
+  activeTool: ActiveTool;
+  onChangeActiveTool: (tool: ActiveTool) => void;
+}
+
+export const Navbar = ({
+  activeTool,
+  onChangeActiveTool
+}: NavbarProps) => {
   return (
     <nav className="w-full flex items-center p-4 h-[68px] gap-x-8
     border-b lg:pl-[34px]">
@@ -39,7 +49,11 @@ export const Navbar = () => {
         </DropdownMenu>
         <Separator orientation="vertical" className="mx-2"></Separator>
         <Hint label="选择" side="bottom" sideOffset={10}>
-          <Button onClick={() => { }} variant="ghost" size="icon" className="">
+          <Button
+            onClick={() => onChangeActiveTool("select")}
+            variant="ghost"
+            size="icon"
+            className={cn(activeTool === "select" && "bg-gray-100")}>
             <MousePointerClick className="size-4" />
           </Button>
         </Hint>

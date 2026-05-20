@@ -1,14 +1,40 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { fabric } from "fabric";
 import { useEditor } from "@/features/editor/hooks/use-editor";
 import { Navbar } from "@/features/editor/components/navbar";
 import { Sidebar } from "@/features/editor/components/sidebar";
 import { Toolbar } from "@/features/editor/components/toolbar";
 import { Footer } from "@/features/editor/components/footer";
+import { ActiveTool } from "../types";
 
 export const Editor = () => {
+
+  const [activeTool, setActiveTool] = useState<ActiveTool>("select");
+
+  //因为待会useEffect会用到onChangeActiveTool函数，所以需要将它记忆化
+  const onChangeActiveTool = useCallback((tool: ActiveTool) => {
+    // 再次点击同一项 → 收起面板，回到「选择」模式
+    if (tool === activeTool) {
+      if (activeTool === "draw") {
+        // TODO: 禁用绘画模式
+      }
+      setActiveTool("select");
+      return;
+    }
+
+    if (tool === "draw") {
+      // TODO: 启用绘画模式
+    }
+
+    if (activeTool === "draw") {
+      // TODO: 禁用绘画模式
+    }
+
+    setActiveTool(tool);
+  }, [activeTool]);
+
   const { init } = useEditor();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -61,9 +87,15 @@ export const Editor = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <Navbar />
+      <Navbar
+        activeTool={activeTool}
+        onChangeActiveTool={onChangeActiveTool}
+      />
       <div className="absolute h-[calc(100%-68px)] w-full top-[68px] flex">
-        <Sidebar></Sidebar>
+        <Sidebar
+          activeTool={activeTool}
+          onChangeActiveTool={onChangeActiveTool}>
+        </Sidebar>
         <main className="bg-muted flex-1 overflow-auto relative flex flex-col">
           <Toolbar></Toolbar>
           <div className="h-[calc(100%-124px)] flex-1 bg-muted" ref={containerRef} />

@@ -135,3 +135,14 @@ body {
     @apply font-sans;
   }
 }
+
+.circle-picker {
+  width: auto !important;
+}
+
+.chrome-picker {
+  width: auto !important;
+  box-shadow: none !important;
+  border-radius: 0.5rem !important;
+  overflow: hidden !important;
+}

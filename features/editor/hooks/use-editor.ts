@@ -1,10 +1,30 @@
 import { useCallback, useState, useMemo } from "react";
 import { fabric } from "fabric";
 import { useAutoResize } from "./use-auto-resize";
-import { BuildEditorProps, Editor, CIRCLE_OPTIONS, RECTANGLE_OPTIONS, TRIANGLE_OPTIONS, DIAMOND_OPTIONS } from "../types";
+import { useCanvasEvents } from "./use-canvas-events";
+import {
+  BuildEditorProps,
+  Editor,
+  CIRCLE_OPTIONS,
+  RECTANGLE_OPTIONS,
+  TRIANGLE_OPTIONS,
+  DIAMOND_OPTIONS,
+  FILL_COLOR,
+  STROKE_COLOR,
+  STROKE_WIDTH
+} from "../types";
+import { isTextType } from "../utils";
+
 
 const buildEditor = ({
   canvas,
+  fillColor,
+  setFillColor,
+  strokeColor,
+  setStrokeColor,
+  strokeWidth,
+  setStrokeWidth,
+  selectedObjects,
 }: BuildEditorProps): Editor => {
 
   //获取工作区
@@ -33,9 +53,47 @@ const buildEditor = ({
   };
 
   return {
+
+    //修改填充颜色
+    changeFillColor: (value: string) => {
+      setFillColor(value);
+      canvas.getActiveObjects().forEach((object) => {
+        object.set({ fill: value });
+      });
+      canvas.renderAll();
+    },
+
+    //修改描边颜色
+    changeStrokeColor: (value: string) => {
+      setStrokeColor(value);
+      canvas.getActiveObjects().forEach((object) => {
+
+        //因为文本类型没有描边，必须要填充值来代替
+        if (isTextType(object.type)) {
+          object.set({ fill: value });
+          return;
+        }
+
+        object.set({ stroke: value });
+      });
+      canvas.renderAll();
+    },
+
+    //修改描边
+    changeStrokeWidth: (value: number) => {
+      setStrokeWidth(value);
+      canvas.getActiveObjects().forEach((object) => {
+        object.set({ strokeWidth: value });
+      });
+      canvas.renderAll();
+    },
+
     addCircle: () => {
       const object = new fabric.Circle({
         ...CIRCLE_OPTIONS,
+        fill: fillColor,
+        stroke: strokeColor,
+        strokeWidth: strokeWidth,
       });
 
       addToCanvas(object);
@@ -45,13 +103,19 @@ const buildEditor = ({
         ...RECTANGLE_OPTIONS,
         rx: 50,
         ry: 50,
+        fill: fillColor,
+        stroke: strokeColor,
+        strokeWidth: strokeWidth,
       });
 
       addToCanvas(object);
     },
     addRectangle: () => {
       const object = new fabric.Rect({
-        ...RECTANGLE_OPTIONS
+        ...RECTANGLE_OPTIONS,
+        fill: fillColor,
+        stroke: strokeColor,
+        strokeWidth: strokeWidth,
       });
 
       addToCanvas(object);
@@ -59,6 +123,9 @@ const buildEditor = ({
     addTriangle: () => {
       const object = new fabric.Triangle({
         ...TRIANGLE_OPTIONS,
+        fill: fillColor,
+        stroke: strokeColor,
+        strokeWidth: strokeWidth,
       });
 
       addToCanvas(object);
@@ -75,6 +142,9 @@ const buildEditor = ({
         ],
         {
           ...TRIANGLE_OPTIONS,
+          fill: fillColor,
+          stroke: strokeColor,
+          strokeWidth: strokeWidth,
         }
       )
 
@@ -93,30 +163,62 @@ const buildEditor = ({
         ],
         {
           ...DIAMOND_OPTIONS,
+          fill: fillColor,
+          stroke: strokeColor,
+          strokeWidth: strokeWidth,
         }
       )
 
       addToCanvas(object);
     },
+    canvas,
+    fillColor,
+    strokeColor,
+    strokeWidth,
+    selectedObjects,
   };
 };
 
 export const useEditor = () => {
   const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
+  //存储我们当前选择的对象类型，根据它是图片/文本来选择显示上方工具栏
+  const [selectedObjects, setSelectedObjects] = useState<fabric.Object[]>([]);
+
+  const [fillColor, setFillColor] = useState(FILL_COLOR);
+  const [strokeColor, setStrokeColor] = useState(STROKE_COLOR);
+  const [strokeWidth, setStrokeWidth] = useState(STROKE_WIDTH);
 
   useAutoResize({ canvas, container });
+
+  useCanvasEvents({
+    canvas,
+    setSelectedObjects
+  })
 
   //缓存编辑器实例
   const editor = useMemo(() => {
     if (canvas) {
       return buildEditor({
         canvas,
+        fillColor,
+        setFillColor,
+        strokeColor,
+        setStrokeColor,
+        strokeWidth,
+        setStrokeWidth,
+        selectedObjects,
       });   //我们在钩子外面定义了这个buildEditor函数
     }
 
     return undefined;
-  }, [canvas])
+  }, [
+    canvas,
+    fillColor,
+    strokeColor,
+    strokeWidth,
+    selectedObjects,
+  ])
 
   const init = useCallback(
     ({

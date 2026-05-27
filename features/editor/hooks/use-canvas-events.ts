@@ -4,11 +4,13 @@ import { useEffect } from "react";
 interface useCanvasEventsProps {
   canvas: fabric.Canvas | null;
   setSelectedObjects: (objects: fabric.Object[]) => void;   //接收的seState中的dispatch函数
+  clearSelectionCallback?: () => void;
 }
 
 export const useCanvasEvents = ({
   canvas,
-  setSelectedObjects
+  setSelectedObjects,
+  clearSelectionCallback,
 }: useCanvasEventsProps) => {
   useEffect(() => {
     if (canvas) {
@@ -20,6 +22,7 @@ export const useCanvasEvents = ({
       });
       canvas.on("selection:cleared", () => {
         setSelectedObjects([]);
+        clearSelectionCallback?.();
       })
     }
 
@@ -32,6 +35,7 @@ export const useCanvasEvents = ({
     }
   }, [
     canvas,
-    setSelectedObjects
+    setSelectedObjects,
+    clearSelectionCallback,
   ])
 }

@@ -7,9 +7,10 @@ import { Navbar } from "@/features/editor/components/navbar";
 import { Sidebar } from "@/features/editor/components/sidebar";
 import { Toolbar } from "@/features/editor/components/toolbar";
 import { Footer } from "@/features/editor/components/footer";
-import { ActiveTool } from "../types";
+import { ActiveTool, selectionDependentTools } from "../types";
 import { ShapeSidebar } from "./shape-sidebar";
 import { FillColorSidebar } from "./fill-color-sidebar";
+import { StrokeColorSidebar } from "./stroke-color-sidebar";
 
 export const Editor = () => {
 
@@ -37,8 +38,19 @@ export const Editor = () => {
     setActiveTool(tool);
   }, [activeTool]);
 
+  //定义一个常量函数来处理清除选中状态
+  const onClearSelection = useCallback(() => {
+    //依赖于选中状态的工具列表中包含了当前激活的工具
+    if (selectionDependentTools.includes(activeTool)) {
+      setActiveTool("select");
+    }
+
+  }, [activeTool]);
+
   //拿到画布初始化函数和编辑器实例
-  const { init, editor } = useEditor();
+  const { init, editor } = useEditor({
+    clearSelectionCallback: onClearSelection,
+  });
   const containerRef = useRef<HTMLDivElement>(null);
 
   // 组件挂载后执行一次「初始化画布」；卸载或依赖变化时执行 return 里的清理
@@ -105,6 +117,11 @@ export const Editor = () => {
           onChangeActiveTool={onChangeActiveTool}>
         </ShapeSidebar>
         <FillColorSidebar
+          editor={editor}
+          activeTool={activeTool}
+          onChangeActiveTool={onChangeActiveTool}
+        />
+        <StrokeColorSidebar
           editor={editor}
           activeTool={activeTool}
           onChangeActiveTool={onChangeActiveTool}

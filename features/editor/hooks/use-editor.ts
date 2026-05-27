@@ -11,7 +11,8 @@ import {
   DIAMOND_OPTIONS,
   FILL_COLOR,
   STROKE_COLOR,
-  STROKE_WIDTH
+  STROKE_WIDTH,
+  EditorHookProps,
 } from "../types";
 import { isTextType } from "../utils";
 
@@ -173,13 +174,39 @@ const buildEditor = ({
     },
     canvas,
     fillColor,
-    strokeColor,
+    getActiveFillColor: () => {
+      const selectedObject = selectedObjects[0];
+
+      //如果没有选中对象，那么活动填充颜色只能是我们最后使用的填充颜色
+      if (!selectedObject) {
+        return fillColor;
+      }
+
+      const value = selectedObject.get("fill") || fillColor;
+
+      //目前渐变和图案不受支持，只支持字符串
+      return value as string;
+    },
+    getActiveStrokeColor: () => {
+      const selectedObject = selectedObjects[0];
+
+      //如果没有选中对象，那么活动描边颜色只能是我们最后使用的描边颜色
+      if (!selectedObject) {
+        return strokeColor;
+      }
+
+      const value = selectedObject.get("stroke") || strokeColor;
+
+      return value;
+    },
     strokeWidth,
     selectedObjects,
   };
 };
 
-export const useEditor = () => {
+export const useEditor = ({
+  clearSelectionCallback
+}: EditorHookProps) => {
   const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
   //存储我们当前选择的对象类型，根据它是图片/文本来选择显示上方工具栏
@@ -193,7 +220,8 @@ export const useEditor = () => {
 
   useCanvasEvents({
     canvas,
-    setSelectedObjects
+    setSelectedObjects,
+    clearSelectionCallback,
   })
 
   //缓存编辑器实例
@@ -218,7 +246,7 @@ export const useEditor = () => {
     strokeColor,
     strokeWidth,
     selectedObjects,
-  ])
+  ]);
 
   const init = useCallback(
     ({

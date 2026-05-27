@@ -1,5 +1,3 @@
-import { useState } from "react";
-import type { fabric } from "fabric";
 import { ActiveTool, Editor } from "../types";
 
 import { Hint } from "@/components/hint";
@@ -18,21 +16,22 @@ export const Toolbar = ({
   onChangeActiveTool
 }: ToolbarProps) => {
 
-  const fillColor = editor?.fillColor;
-
   //如果编辑器选中对象长度为0就不显示那个颜色小方块了
-  if (editor?.selectedObjects.length === 0) {
+  if (!editor || editor.selectedObjects.length === 0) {
     return (
       <div className="shrink-0 h-[56px] border-b bg-white w-full flex
     items-center overflow-x-auto z-49 p-2 gap-x-2" />
-    )
+    );
   }
+
+  const fillColor = editor.getActiveFillColor?.();
+  const strokeColor = editor.getActiveStrokeColor?.();
 
   return (
     <div className="shrink-0 h-[56px] border-b bg-white w-full flex
     items-center overflow-x-auto z-49 p-2 gap-x-2">
       <div className="flex items-center h-full justify-center">
-        <Hint label="Color" side="bottom" sideOffset={5}>
+        <Hint label="填充颜色" side="bottom" sideOffset={5}>
           <Button
             onClick={() => onChangeActiveTool("fill")}
             size="icon"
@@ -44,6 +43,23 @@ export const Toolbar = ({
             <div
               className="rounded-sm size-4 border"
               style={{ backgroundColor: fillColor }}
+            />
+          </Button>
+        </Hint>
+      </div>
+      <div className="flex items-center h-full justify-center">
+        <Hint label="描边颜色" side="bottom" sideOffset={5}>
+          <Button
+            onClick={() => onChangeActiveTool("stroke-color")}
+            size="icon"
+            variant="ghost"
+            className={cn(
+              activeTool === "stroke-color" && "bg-gray-100"
+            )}
+          >
+            <div
+              className="rounded-sm size-4 border-2 bg-white"
+              style={{ borderColor: strokeColor }}
             />
           </Button>
         </Hint>

@@ -123,6 +123,8 @@ export type BuildEditorProps = {
 
 //BuildEditor要传出的类型
 export interface Editor {
+  bringForward: () => void;
+  sendBackwards: () => void;
   changeFillColor: (value: string) => void;
   changeStrokeColor: (value: string) => void;
   changeStrokeWidth: (value: number) => void;

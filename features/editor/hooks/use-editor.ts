@@ -57,6 +57,25 @@ const buildEditor = ({
   };
 
   return {
+    bringForward: () => {
+      canvas.getActiveObjects().forEach((object) => {
+        canvas.bringForward(object);
+      });
+
+      canvas.renderAll();
+      //TODO：处理工作区溢出问题，元素不能移到实际的工作区下面
+      const workspace = getWorkspace();
+      workspace?.sendToBack();
+    },
+    sendBackwards: () => {
+      canvas.getActiveObjects().forEach((object) => {
+        canvas.sendBackwards(object);
+      });
+      canvas.renderAll();
+
+      const workspace = getWorkspace();
+      workspace?.sendToBack();
+    },
 
     //修改填充颜色
     changeFillColor: (value: string) => {

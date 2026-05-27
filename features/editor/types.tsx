@@ -1,4 +1,5 @@
 import { fabric } from "fabric";
+import { ITextboxOptions } from "fabric/fabric-impl";
 import * as material from "material-colors";
 
 //依赖于选中状态的工具
@@ -56,6 +57,8 @@ export const FILL_COLOR = "rgba(0,0,0,1)";
 export const STROKE_COLOR = "rgba(0,0,0,1)";
 export const STROKE_WIDTH = 2;
 export const STROKE_DASH_ARRAY = [];
+export const FONT_FAMILY = "Arial";
+export const FONT_SIZE = 32;
 
 //圆形类型
 export const CIRCLE_OPTIONS = {
@@ -103,6 +106,16 @@ export const DIAMOND_OPTIONS = {
   angle: 0,
 };
 
+//文本默认值
+export const TEXT_OPTIONS = {
+  type: "textbox",
+  left: 100,
+  top: 100,
+  fill: FILL_COLOR,
+  fontSize: FONT_SIZE,
+  fontFamily: FONT_FAMILY,
+}
+
 export interface EditorHookProps {
   clearSelectionCallback?: () => void;
 }
@@ -123,6 +136,9 @@ export type BuildEditorProps = {
 
 //BuildEditor要传出的类型
 export interface Editor {
+  addText: (value: string, option?: ITextboxOptions) => void;
+  getActiveOpacity: () => number;
+  changeOpacity: (value: number) => void;
   bringForward: () => void;
   sendBackwards: () => void;
   changeFillColor: (value: string) => void;

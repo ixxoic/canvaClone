@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { BsBorderWidth } from "react-icons/bs";
 import { ArrowUp, ArrowDown } from "lucide-react";
+import { RxTransparencyGrid } from "react-icons/rx";
+import { isTextType } from "../utils";
 
 interface ToolbarProps {
   editor: Editor | undefined;
@@ -29,6 +31,12 @@ export const Toolbar = ({
   const fillColor = editor.getActiveFillColor?.();
   const strokeColor = editor.getActiveStrokeColor?.();
 
+  //拿到当前选择的对象是文本还是形状类型
+  const selectedObjectType = editor?.selectedObjects[0]?.type;
+
+  //判断当前选择的对象是否为文本类型
+  const isText = isTextType(selectedObjectType);
+
   return (
     <div className="shrink-0 h-[56px] border-b bg-white w-full flex
     items-center overflow-x-auto z-49 p-2 gap-x-2">
@@ -49,37 +57,41 @@ export const Toolbar = ({
           </Button>
         </Hint>
       </div>
-      <div className="flex items-center h-full justify-center">
-        <Hint label="描边颜色" side="bottom" sideOffset={5}>
-          <Button
-            onClick={() => onChangeActiveTool("stroke-color")}
-            size="icon"
-            variant="ghost"
-            className={cn(
-              activeTool === "stroke-color" && "bg-gray-100"
-            )}
-          >
-            <div
-              className="rounded-sm size-4 border-2 bg-white"
-              style={{ borderColor: strokeColor }}
-            />
-          </Button>
-        </Hint>
-      </div>
-      <div className="flex items-center h-full justify-center">
-        <Hint label="描边宽度" side="bottom" sideOffset={5}>
-          <Button
-            onClick={() => onChangeActiveTool("stroke-width")}
-            size="icon"
-            variant="ghost"
-            className={cn(
-              activeTool === "stroke-width" && "bg-gray-100"
-            )}
-          >
-            <BsBorderWidth className="size-4" />
-          </Button>
-        </Hint>
-      </div>
+      {!isText && (
+        <div className="flex items-center h-full justify-center">
+          <Hint label="描边颜色" side="bottom" sideOffset={5}>
+            <Button
+              onClick={() => onChangeActiveTool("stroke-color")}
+              size="icon"
+              variant="ghost"
+              className={cn(
+                activeTool === "stroke-color" && "bg-gray-100"
+              )}
+            >
+              <div
+                className="rounded-sm size-4 border-2 bg-white"
+                style={{ borderColor: strokeColor }}
+              />
+            </Button>
+          </Hint>
+        </div>
+      )}
+      {!isText && (
+        <div className="flex items-center h-full justify-center">
+          <Hint label="描边宽度" side="bottom" sideOffset={5}>
+            <Button
+              onClick={() => onChangeActiveTool("stroke-width")}
+              size="icon"
+              variant="ghost"
+              className={cn(
+                activeTool === "stroke-width" && "bg-gray-100"
+              )}
+            >
+              <BsBorderWidth className="size-4" />
+            </Button>
+          </Hint>
+        </div>
+      )}
       <div className="flex items-center h-full justify-center">
         <Hint label="置前" side="bottom" sideOffset={5}>
           <Button
@@ -99,6 +111,18 @@ export const Toolbar = ({
             variant="ghost"
           >
             <ArrowDown className="size-4" />
+          </Button>
+        </Hint>
+      </div>
+      <div className="flex items-center h-full justify-center">
+        <Hint label="不透明度" side="bottom" sideOffset={5}>
+          <Button
+            onClick={() => onChangeActiveTool("opacity")}
+            size="icon"
+            variant="ghost"
+            className={cn(activeTool === "opacity" && "bg-gray-100")}
+          >
+            <RxTransparencyGrid className="size-4" />
           </Button>
         </Hint>
       </div>

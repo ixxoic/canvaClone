@@ -2,6 +2,37 @@ import { fabric } from "fabric";
 import { ITextboxOptions } from "fabric/fabric-impl";
 import * as material from "material-colors";
 
+//定义所有可用的字体
+export const fonts = [
+  "宋体",
+  "黑体",
+  "微软雅黑",
+  "方正公文仿宋",
+  "方正姚体",
+  "汉仪雅酷黑简",
+  "华文彩云",
+  "华文琥珀",
+  "华文隶书",
+  "Arial",
+  "Arail Black",
+  "Verdana",
+  "Helvetica",
+  "Tahoma",
+  "Trebuchet MS",
+  "Times New Roman",
+  "Georgia",
+  "Garamond",
+  "Courier New",
+  "Brush Script MT",
+  "Palatino",
+  "Bookman",
+  "Comic Sans MS",
+  "Impact",
+  "Lucida Sans Unicode",
+  "Geneva",
+  "Lucida Console",
+]
+
 //依赖于选中状态的工具
 export const selectionDependentTools = [
   "fill",
@@ -128,14 +159,18 @@ export type BuildEditorProps = {
   strokeWidth: number;
   strokeDashArray: number[];
   selectedObjects: fabric.Object[];
+  fontFamily: string;
   setFillColor: (value: string) => void;
   setStrokeColor: (value: string) => void;
   setStrokeWidth: (value: number) => void;
   setStrokeDashArray: (value: number[]) => void;
+  setFontFamily: (value: string) => void;
 }
 
 //BuildEditor要传出的类型
 export interface Editor {
+  getActiveFontFamily: () => string;
+  changeFontFamily: (value: string) => void;
   addText: (value: string, option?: ITextboxOptions) => void;
   getActiveOpacity: () => number;
   changeOpacity: (value: number) => void;

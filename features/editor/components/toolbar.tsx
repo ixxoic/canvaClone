@@ -4,7 +4,7 @@ import { Hint } from "@/components/hint";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { BsBorderWidth } from "react-icons/bs";
-import { ArrowUp, ArrowDown } from "lucide-react";
+import { ArrowUp, ArrowDown, ChevronDown } from "lucide-react";
 import { RxTransparencyGrid } from "react-icons/rx";
 import { isTextType } from "../utils";
 
@@ -30,6 +30,7 @@ export const Toolbar = ({
 
   const fillColor = editor.getActiveFillColor?.();
   const strokeColor = editor.getActiveStrokeColor?.();
+  const fontFamily = editor.getActiveFontFamily?.();
 
   //拿到当前选择的对象是文本还是形状类型
   const selectedObjectType = editor?.selectedObjects[0]?.type;
@@ -88,6 +89,26 @@ export const Toolbar = ({
               )}
             >
               <BsBorderWidth className="size-4" />
+            </Button>
+          </Hint>
+        </div>
+      )}
+      {isText && (
+        <div className="flex items-center h-full justify-center">
+          <Hint label="字体" side="bottom" sideOffset={5}>
+            <Button
+              onClick={() => onChangeActiveTool("font")}
+              size="icon"
+              variant="ghost"
+              className={cn(
+                "w-auto px-2 text-sm",
+                activeTool === "font" && "bg-gray-100"
+              )}
+            >
+              <div className="max-w-[100px] truncate">
+                {fontFamily}
+              </div>
+              <ChevronDown className="size-4 ml-2 shrink-0" />
             </Button>
           </Hint>
         </div>

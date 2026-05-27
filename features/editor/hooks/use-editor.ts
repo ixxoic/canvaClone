@@ -15,6 +15,8 @@ import {
   EditorHookProps,
   STROKE_DASH_ARRAY,
   TEXT_OPTIONS,
+  FONT_FAMILY,
+  FONT_SIZE,
 } from "../types";
 import { isTextType } from "../utils";
 
@@ -29,7 +31,9 @@ const buildEditor = ({
   setStrokeWidth,
   selectedObjects,
   strokeDashArray,
-  setStrokeDashArray
+  setStrokeDashArray,
+  fontFamily,
+  setFontFamily,
 }: BuildEditorProps): Editor => {
 
   //获取工作区
@@ -105,6 +109,18 @@ const buildEditor = ({
 
       const workspace = getWorkspace();
       workspace?.sendToBack();
+    },
+
+    //修改字体
+    changeFontFamily: (value: string) => {
+      setFontFamily(value);
+      canvas.getActiveObjects().forEach((object) => {
+        if (isTextType(object.type)) {
+          //@ts-expect-error fontFamily存在
+          object.set({ fontFamily: value });
+        }
+      });
+      canvas.renderAll();
     },
 
     //修改填充颜色
@@ -239,6 +255,20 @@ const buildEditor = ({
       addToCanvas(object);
     },
     canvas,
+    getActiveFontFamily: () => {
+      const selectedObject = selectedObjects[0];
+
+      //如果没有选中对象，那么活动填充颜色只能是我们最后使用的填充颜色
+      if (!selectedObject) {
+        return fontFamily;
+      }
+
+      //@ts-expect-error fontFamily存在
+      const value = selectedObject.get("fontFamily") || fontFamily;
+
+      //目前渐变和图案不受支持，只支持字符串
+      return value;
+    },
     getActiveFillColor: () => {
       const selectedObject = selectedObjects[0];
 
@@ -300,6 +330,8 @@ export const useEditor = ({
   //存储我们当前选择的对象类型，根据它是图片/文本来选择显示上方工具栏
   const [selectedObjects, setSelectedObjects] = useState<fabric.Object[]>([]);
 
+  const [fontFamily, setFontFamily] = useState(FONT_FAMILY);
+  const [fontSize, setFontSize] = useState(FONT_SIZE);
   const [fillColor, setFillColor] = useState(FILL_COLOR);
   const [strokeColor, setStrokeColor] = useState(STROKE_COLOR);
   const [strokeWidth, setStrokeWidth] = useState(STROKE_WIDTH);
@@ -327,6 +359,8 @@ export const useEditor = ({
         strokeDashArray,
         setStrokeDashArray,
         selectedObjects,
+        fontFamily,
+        setFontFamily,
       });   //我们在钩子外面定义了这个buildEditor函数
     }
 
@@ -338,6 +372,7 @@ export const useEditor = ({
     strokeWidth,
     selectedObjects,
     strokeDashArray,
+    fontFamily,
   ]);
 
   const init = useCallback(

@@ -55,6 +55,7 @@ export type ActiveTool =
 export const FILL_COLOR = "rgba(0,0,0,1)";
 export const STROKE_COLOR = "rgba(0,0,0,1)";
 export const STROKE_WIDTH = 2;
+export const STROKE_DASH_ARRAY = [];
 
 //圆形类型
 export const CIRCLE_OPTIONS = {
@@ -112,10 +113,12 @@ export type BuildEditorProps = {
   fillColor: string;
   strokeColor: string;
   strokeWidth: number;
+  strokeDashArray: number[];
   selectedObjects: fabric.Object[];
   setFillColor: (value: string) => void;
   setStrokeColor: (value: string) => void;
   setStrokeWidth: (value: number) => void;
+  setStrokeDashArray: (value: number[]) => void;
 }
 
 //BuildEditor要传出的类型
@@ -123,6 +126,7 @@ export interface Editor {
   changeFillColor: (value: string) => void;
   changeStrokeColor: (value: string) => void;
   changeStrokeWidth: (value: number) => void;
+  changeStrokeDashArray: (value: number[]) => void;
   addCircle: () => void;
   addSoftRectangle: () => void;
   addRectangle: () => void;
@@ -130,9 +134,9 @@ export interface Editor {
   addInverseTriangle: () => void;
   addDiamond: () => void;
   canvas: fabric.Canvas;
-  fillColor: string;
   getActiveFillColor: () => string;
   getActiveStrokeColor: () => string;
-  strokeWidth: number;
+  getActiveStrokeWidth: () => number;
+  getActiveStrokeDashArray: () => number[];
   selectedObjects: fabric.Object[];
 }

@@ -13,6 +13,7 @@ import {
   STROKE_COLOR,
   STROKE_WIDTH,
   EditorHookProps,
+  STROKE_DASH_ARRAY,
 } from "../types";
 import { isTextType } from "../utils";
 
@@ -26,6 +27,8 @@ const buildEditor = ({
   strokeWidth,
   setStrokeWidth,
   selectedObjects,
+  strokeDashArray,
+  setStrokeDashArray
 }: BuildEditorProps): Editor => {
 
   //获取工作区
@@ -89,12 +92,21 @@ const buildEditor = ({
       canvas.renderAll();
     },
 
+    changeStrokeDashArray: (value: number[]) => {
+      setStrokeDashArray(value);
+      canvas.getActiveObjects().forEach((object) => {
+        object.set({ strokeDashArray: value });
+      });
+      canvas.renderAll();
+    },
+
     addCircle: () => {
       const object = new fabric.Circle({
         ...CIRCLE_OPTIONS,
         fill: fillColor,
         stroke: strokeColor,
         strokeWidth: strokeWidth,
+        strokeDashArray: strokeDashArray,
       });
 
       addToCanvas(object);
@@ -107,6 +119,7 @@ const buildEditor = ({
         fill: fillColor,
         stroke: strokeColor,
         strokeWidth: strokeWidth,
+        strokeDashArray: strokeDashArray,
       });
 
       addToCanvas(object);
@@ -117,6 +130,7 @@ const buildEditor = ({
         fill: fillColor,
         stroke: strokeColor,
         strokeWidth: strokeWidth,
+        strokeDashArray: strokeDashArray,
       });
 
       addToCanvas(object);
@@ -127,6 +141,7 @@ const buildEditor = ({
         fill: fillColor,
         stroke: strokeColor,
         strokeWidth: strokeWidth,
+        strokeDashArray: strokeDashArray,
       });
 
       addToCanvas(object);
@@ -146,6 +161,7 @@ const buildEditor = ({
           fill: fillColor,
           stroke: strokeColor,
           strokeWidth: strokeWidth,
+          strokeDashArray: strokeDashArray,
         }
       )
 
@@ -167,13 +183,13 @@ const buildEditor = ({
           fill: fillColor,
           stroke: strokeColor,
           strokeWidth: strokeWidth,
+          strokeDashArray: strokeDashArray,
         }
       )
 
       addToCanvas(object);
     },
     canvas,
-    fillColor,
     getActiveFillColor: () => {
       const selectedObject = selectedObjects[0];
 
@@ -199,7 +215,30 @@ const buildEditor = ({
 
       return value;
     },
-    strokeWidth,
+    getActiveStrokeWidth: () => {
+      const selectedObject = selectedObjects[0];
+
+      //如果没有选中对象，那么活动描边宽度只能是我们最后使用的描边宽度
+      if (!selectedObject) {
+        return strokeWidth;
+      }
+
+      const value = selectedObject.get("strokeWidth") || strokeWidth;
+
+      return value;
+    },
+    getActiveStrokeDashArray: () => {
+      const selectedObject = selectedObjects[0];
+
+      //如果没有选中对象，那么活动描边虚线数组只能是我们最后使用的描边虚线数组
+      if (!selectedObject) {
+        return strokeDashArray;
+      }
+
+      const value = selectedObject.get("strokeDashArray") || strokeDashArray;
+
+      return value;
+    },
     selectedObjects,
   };
 };
@@ -215,6 +254,7 @@ export const useEditor = ({
   const [fillColor, setFillColor] = useState(FILL_COLOR);
   const [strokeColor, setStrokeColor] = useState(STROKE_COLOR);
   const [strokeWidth, setStrokeWidth] = useState(STROKE_WIDTH);
+  const [strokeDashArray, setStrokeDashArray] = useState<number[]>(STROKE_DASH_ARRAY);
 
   useAutoResize({ canvas, container });
 
@@ -235,6 +275,8 @@ export const useEditor = ({
         setStrokeColor,
         strokeWidth,
         setStrokeWidth,
+        strokeDashArray,
+        setStrokeDashArray,
         selectedObjects,
       });   //我们在钩子外面定义了这个buildEditor函数
     }
@@ -246,6 +288,7 @@ export const useEditor = ({
     strokeColor,
     strokeWidth,
     selectedObjects,
+    strokeDashArray,
   ]);
 
   const init = useCallback(

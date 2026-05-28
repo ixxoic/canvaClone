@@ -170,6 +170,7 @@ export type BuildEditorProps = {
 
 //BuildEditor要传出的类型
 export interface Editor {
+  addImage: (value: string) => void;
   delete: () => void;
   getActiveFontSize: () => number;
   changeFontSize: (value: number) => void;

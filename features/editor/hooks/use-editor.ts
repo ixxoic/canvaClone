@@ -64,6 +64,14 @@ const buildEditor = ({
 
   return {
 
+    delete: () => {
+      canvas.getActiveObjects().forEach((object) => canvas.remove(object));
+
+      //移除对象后还得丢弃选区
+      canvas.discardActiveObject();
+      canvas.renderAll();
+    },
+
     addText: (value, options) => {
       const object = new fabric.Textbox(value, {
         ...TEXT_OPTIONS,

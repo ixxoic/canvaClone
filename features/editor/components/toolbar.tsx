@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { FontSizeInput } from "./font-size-input";
 import { cn } from "@/lib/utils";
 import { BsBorderWidth } from "react-icons/bs";
-import { ArrowUp, ArrowDown, ChevronDown, AlignCenter, AlignLeft, AlignRight } from "lucide-react";
+import { ArrowUp, ArrowDown, ChevronDown, AlignCenter, AlignLeft, AlignRight, Trash } from "lucide-react";
 import { RxTransparencyGrid } from "react-icons/rx";
 import { isTextType } from "../utils";
 import { FaBold, FaItalic, FaStrikethrough, FaUnderline } from "react-icons/fa";
@@ -374,6 +374,17 @@ export const Toolbar = ({
             className={cn(activeTool === "opacity" && "bg-gray-100")}
           >
             <RxTransparencyGrid className="size-4" />
+          </Button>
+        </Hint>
+      </div>
+      <div className="flex items-center h-full justify-center">
+        <Hint label="删除" side="bottom" sideOffset={5}>
+          <Button
+            onClick={() => editor?.delete()}
+            size="icon"
+            variant="ghost"
+          >
+            <Trash className="size-4" />
           </Button>
         </Hint>
       </div>

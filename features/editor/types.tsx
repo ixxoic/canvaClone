@@ -170,6 +170,8 @@ export type BuildEditorProps = {
 
 //BuildEditor要传出的类型
 export interface Editor {
+  getActiveFontSize: () => number;
+  changeFontSize: (value: number) => void;
   getActiveTextAlign: () => string;
   changeTextAlign: (value: string) => void;
   changeFontUnderline: (value: boolean) => void;

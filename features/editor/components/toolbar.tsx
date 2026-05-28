@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { ActiveTool, Editor, FONT_WEIGHT } from "../types";
+import { ActiveTool, Editor, FONT_SIZE, FONT_WEIGHT } from "../types";
 
 import { Hint } from "@/components/hint";
 import { Button } from "@/components/ui/button";
+import { FontSizeInput } from "./font-size-input";
 import { cn } from "@/lib/utils";
 import { BsBorderWidth } from "react-icons/bs";
 import { ArrowUp, ArrowDown, ChevronDown, AlignCenter, AlignLeft, AlignRight } from "lucide-react";
@@ -30,6 +31,7 @@ export const Toolbar = ({
   const initialFontLinethrough = editor?.getActiveFontLinethrough?.();
   const initialFontUnderline = editor?.getActiveFontUnderline?.();
   const initialTextAlign = editor?.getActiveTextAlign?.();
+  const initialFontSize = editor?.getActiveFontSize?.() || FONT_SIZE;
   const [properties, setProperties] = useState({
     fillColor: initialFillColor,
     strokeColor: initialStrokeColor,
@@ -39,6 +41,7 @@ export const Toolbar = ({
     fontLinethrough: initialFontLinethrough,
     fontUnderline: initialFontUnderline,
     textAlign: initialTextAlign,
+    fontSize: initialFontSize,
   });
 
   //如果编辑器选中对象长度为0就不显示那个颜色小方块了
@@ -56,6 +59,19 @@ export const Toolbar = ({
 
   //判断当前选择的对象是否为文本类型
   const isText = isTextType(selectedObjectType);
+
+  //修改字号大小
+  const onChangeFontSize = (value: number) => {
+    if (!selectedObject) {
+      return;
+    }
+
+    editor?.changeFontSize(value);
+    setProperties((current) => ({
+      ...current,
+      fontSize: value,
+    }))
+  }
 
   //切换文本对齐方式
   const onChangeTextAlign = (value: string) => {
@@ -317,6 +333,14 @@ export const Toolbar = ({
               <AlignRight className="size-4" />
             </Button>
           </Hint>
+        </div>
+      )}
+      {isText && (
+        <div className="flex items-center h-full justify-center">
+          <FontSizeInput
+            value={properties.fontSize}
+            onChange={onChangeFontSize}
+          />
         </div>
       )}
       <div className="flex items-center h-full justify-center">

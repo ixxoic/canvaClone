@@ -16,7 +16,8 @@ import {
   STROKE_DASH_ARRAY,
   TEXT_OPTIONS,
   FONT_FAMILY,
-  FONT_WEIGHT
+  FONT_WEIGHT,
+  FONT_SIZE
 } from "../types";
 import { isTextType } from "../utils";
 
@@ -118,6 +119,29 @@ const buildEditor = ({
 
       const workspace = getWorkspace();
       workspace?.sendToBack();
+    },
+    //修改字号大小
+    changeFontSize: (value: number) => {
+      canvas.getActiveObjects().forEach((object) => {
+        if (isTextType(object.type)) {
+          //@ts-expect-error fontSize存在
+          object.set({ fontSize: value });
+        }
+      });
+      canvas.renderAll();
+    },
+    getActiveFontSize: () => {
+      const selectedObject = selectedObjects[0];
+
+      //如果没有选中对象，那么活动填充颜色只能是我们最后使用的填充颜色
+      if (!selectedObject) {
+        return FONT_SIZE;
+      }
+
+      //@ts-expect-error fontSize存在
+      const value = selectedObject.get("fontSize") || FONT_SIZE;
+
+      return value;
     },
     //修改文本对齐方式
     changeTextAlign: (value: string) => {

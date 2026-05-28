@@ -16,7 +16,7 @@ import {
   STROKE_DASH_ARRAY,
   TEXT_OPTIONS,
   FONT_FAMILY,
-  FONT_SIZE,
+  FONT_WEIGHT
 } from "../types";
 import { isTextType } from "../utils";
 
@@ -84,6 +84,15 @@ const buildEditor = ({
 
       return value;
     },
+    changeFontWeight: (value: number) => {
+      canvas.getActiveObjects().forEach((object) => {
+        if (isTextType(object.type)) {
+          //@ts-expect-error fontWeight存在
+          object.set({ fontWeight: value });
+        }
+      });
+      canvas.renderAll();
+    },
     changeOpacity: (value: number) => {
       canvas.getActiveObjects().forEach((object) => {
         object.set({ opacity: value });
@@ -109,6 +118,85 @@ const buildEditor = ({
 
       const workspace = getWorkspace();
       workspace?.sendToBack();
+    },
+    //修改文本对齐方式
+    changeTextAlign: (value: string) => {
+      canvas.getActiveObjects().forEach((object) => {
+        if (isTextType(object.type)) {
+          //@ts-expect-error textAlign存在
+          object.set({ textAlign: value });
+        }
+      });
+      canvas.renderAll();
+    },
+    getActiveTextAlign: () => {
+      const selectedObject = selectedObjects[0];
+
+      //如果没有选中对象，那么活动填充颜色只能是我们最后使用的填充颜色
+      if (!selectedObject) {
+        return "left";
+      }
+
+      //@ts-expect-error textAlign存在
+      const value = selectedObject.get("textAlign") || "left";
+
+      return value;
+    },
+    //修改删除线
+    changeFontUnderline: (value: boolean) => {
+      canvas.getActiveObjects().forEach((object) => {
+        if (isTextType(object.type)) {
+          //@ts-expect-error underline存在
+          object.set({ underline: value });
+        }
+      });
+      canvas.renderAll();
+    },
+    getActiveFontUnderline: () => {
+      const selectedObject = selectedObjects[0];
+
+      //如果没有选中对象，那么活动填充颜色只能是我们最后使用的填充颜色
+      if (!selectedObject) {
+        return false;
+      }
+
+      //@ts-expect-error underline存在
+      const value = selectedObject.get("underline") || false;
+
+      return value;
+    },
+    //修改删除线
+    changeFontLinethrough: (value: boolean) => {
+      canvas.getActiveObjects().forEach((object) => {
+        if (isTextType(object.type)) {
+          //@ts-expect-error linethrough存在
+          object.set({ linethrough: value });
+        }
+      });
+      canvas.renderAll();
+    },
+    getActiveFontLinethrough: () => {
+      const selectedObject = selectedObjects[0];
+
+      //如果没有选中对象，那么活动填充颜色只能是我们最后使用的填充颜色
+      if (!selectedObject) {
+        return false;
+      }
+
+      //@ts-expect-error linethrough存在
+      const value = selectedObject.get("linethrough") || false;
+
+      return value;
+    },
+    //修改斜体
+    changeFontStyle: (value: string) => {
+      canvas.getActiveObjects().forEach((object) => {
+        if (isTextType(object.type)) {
+          //@ts-expect-error fontStyle存在
+          object.set({ fontStyle: value });
+        }
+      });
+      canvas.renderAll();
     },
 
     //修改字体
@@ -255,6 +343,32 @@ const buildEditor = ({
       addToCanvas(object);
     },
     canvas,
+    getActiveFontStyle: () => {
+      const selectedObject = selectedObjects[0];
+
+      //如果没有选中对象，那么活动填充颜色只能是我们最后使用的填充颜色
+      if (!selectedObject) {
+        return "normal";
+      }
+
+      //@ts-expect-error fontStyle存在
+      const value = selectedObject.get("fontStyle") || "normal";
+
+      return value;
+    },
+    getActiveFontWeight: () => {
+      const selectedObject = selectedObjects[0];
+
+      //如果没有选中对象，那么活动填充颜色只能是我们最后使用的填充颜色
+      if (!selectedObject) {
+        return FONT_WEIGHT;
+      }
+
+      //@ts-expect-error fontWeight存在
+      const value = selectedObject.get("fontWeight") || FONT_WEIGHT;
+
+      return value;
+    },
     getActiveFontFamily: () => {
       const selectedObject = selectedObjects[0];
 
@@ -266,7 +380,6 @@ const buildEditor = ({
       //@ts-expect-error fontFamily存在
       const value = selectedObject.get("fontFamily") || fontFamily;
 
-      //目前渐变和图案不受支持，只支持字符串
       return value;
     },
     getActiveFillColor: () => {
@@ -331,7 +444,6 @@ export const useEditor = ({
   const [selectedObjects, setSelectedObjects] = useState<fabric.Object[]>([]);
 
   const [fontFamily, setFontFamily] = useState(FONT_FAMILY);
-  const [fontSize, setFontSize] = useState(FONT_SIZE);
   const [fillColor, setFillColor] = useState(FILL_COLOR);
   const [strokeColor, setStrokeColor] = useState(STROKE_COLOR);
   const [strokeWidth, setStrokeWidth] = useState(STROKE_WIDTH);

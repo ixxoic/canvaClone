@@ -90,6 +90,7 @@ export const STROKE_WIDTH = 2;
 export const STROKE_DASH_ARRAY = [];
 export const FONT_FAMILY = "Arial";
 export const FONT_SIZE = 32;
+export const FONT_WEIGHT = 400;
 
 //圆形类型
 export const CIRCLE_OPTIONS = {
@@ -169,6 +170,16 @@ export type BuildEditorProps = {
 
 //BuildEditor要传出的类型
 export interface Editor {
+  getActiveTextAlign: () => string;
+  changeTextAlign: (value: string) => void;
+  changeFontUnderline: (value: boolean) => void;
+  getActiveFontUnderline: () => boolean;
+  changeFontLinethrough: (value: boolean) => void;
+  getActiveFontLinethrough: () => boolean;
+  getActiveFontStyle: () => string;
+  changeFontStyle: (value: string) => void;
+  changeFontWeight: (value: number) => void;
+  getActiveFontWeight: () => number;
   getActiveFontFamily: () => string;
   changeFontFamily: (value: string) => void;
   addText: (value: string, option?: ITextboxOptions) => void;

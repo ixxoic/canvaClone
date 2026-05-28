@@ -1,12 +1,14 @@
-import { ActiveTool, Editor } from "../types";
+import { useState } from "react";
+import { ActiveTool, Editor, FONT_WEIGHT } from "../types";
 
 import { Hint } from "@/components/hint";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { BsBorderWidth } from "react-icons/bs";
-import { ArrowUp, ArrowDown, ChevronDown } from "lucide-react";
+import { ArrowUp, ArrowDown, ChevronDown, AlignCenter, AlignLeft, AlignRight } from "lucide-react";
 import { RxTransparencyGrid } from "react-icons/rx";
 import { isTextType } from "../utils";
+import { FaBold, FaItalic, FaStrikethrough, FaUnderline } from "react-icons/fa";
 
 interface ToolbarProps {
   editor: Editor | undefined;
@@ -20,6 +22,25 @@ export const Toolbar = ({
   onChangeActiveTool
 }: ToolbarProps) => {
 
+  const initialFillColor = editor?.getActiveFillColor?.();
+  const initialStrokeColor = editor?.getActiveStrokeColor?.();
+  const initialFontFamily = editor?.getActiveFontFamily?.();
+  const initialFontWeight = editor?.getActiveFontWeight?.() || FONT_WEIGHT;
+  const initialFontStyle = editor?.getActiveFontStyle?.();
+  const initialFontLinethrough = editor?.getActiveFontLinethrough?.();
+  const initialFontUnderline = editor?.getActiveFontUnderline?.();
+  const initialTextAlign = editor?.getActiveTextAlign?.();
+  const [properties, setProperties] = useState({
+    fillColor: initialFillColor,
+    strokeColor: initialStrokeColor,
+    fontFamily: initialFontFamily,
+    fontWeight: initialFontWeight,
+    fontStyle: initialFontStyle,
+    fontLinethrough: initialFontLinethrough,
+    fontUnderline: initialFontUnderline,
+    textAlign: initialTextAlign,
+  });
+
   //如果编辑器选中对象长度为0就不显示那个颜色小方块了
   if (!editor || editor.selectedObjects.length === 0) {
     return (
@@ -28,15 +49,88 @@ export const Toolbar = ({
     );
   }
 
-  const fillColor = editor.getActiveFillColor?.();
-  const strokeColor = editor.getActiveStrokeColor?.();
-  const fontFamily = editor.getActiveFontFamily?.();
 
   //拿到当前选择的对象是文本还是形状类型
   const selectedObjectType = editor?.selectedObjects[0]?.type;
+  const selectedObject = editor.selectedObjects[0];
 
   //判断当前选择的对象是否为文本类型
   const isText = isTextType(selectedObjectType);
+
+  //切换文本对齐方式
+  const onChangeTextAlign = (value: string) => {
+    if (!selectedObject) {
+      return;
+    }
+
+    editor?.changeTextAlign(value);
+    setProperties((current) => ({
+      ...current,
+      textAlign: value,
+    }))
+  }
+
+  //切换粗细体
+  const toggleBold = () => {
+
+    if (!selectedObject) {
+      return;
+    }
+
+    const newValue = properties.fontWeight > 500 ? FONT_WEIGHT : 700;
+
+    editor?.changeFontWeight(newValue);
+    setProperties((current) => ({
+      ...current,
+      fontWeight: newValue,
+    }));
+  }
+
+  //切换斜体
+  const toggleItalic = () => {
+    if (!selectedObject) {
+      return;
+    }
+
+    const isItalic = properties.fontStyle === "italic";
+    const newValue = isItalic ? "normal" : "italic";
+
+    editor?.changeFontStyle(newValue);
+    setProperties((current) => ({
+      ...current,
+      fontStyle: newValue,
+    }));
+  }
+
+  //切换删除线
+  const toggleLinethrough = () => {
+    if (!selectedObject) {
+      return;
+    }
+
+    const newValue = properties.fontLinethrough ? false : true;
+
+    editor?.changeFontLinethrough(newValue);
+    setProperties((current) => ({
+      ...current,
+      fontLinethrough: newValue,
+    }));
+  }
+
+  //切换下划线
+  const toggleUnderline = () => {
+    if (!selectedObject) {
+      return;
+    }
+
+    const newValue = properties.fontUnderline ? false : true;
+
+    editor?.changeFontUnderline(newValue);
+    setProperties((current) => ({
+      ...current,
+      fontUnderline: newValue,
+    }));
+  }
 
   return (
     <div className="shrink-0 h-[56px] border-b bg-white w-full flex
@@ -53,7 +147,7 @@ export const Toolbar = ({
           >
             <div
               className="rounded-sm size-4 border"
-              style={{ backgroundColor: fillColor }}
+              style={{ backgroundColor: properties.fillColor }}
             />
           </Button>
         </Hint>
@@ -71,7 +165,7 @@ export const Toolbar = ({
             >
               <div
                 className="rounded-sm size-4 border-2 bg-white"
-                style={{ borderColor: strokeColor }}
+                style={{ borderColor: properties.strokeColor }}
               />
             </Button>
           </Hint>
@@ -106,9 +200,121 @@ export const Toolbar = ({
               )}
             >
               <div className="max-w-[100px] truncate">
-                {fontFamily}
+                {properties.fontFamily}
               </div>
               <ChevronDown className="size-4 ml-2 shrink-0" />
+            </Button>
+          </Hint>
+        </div>
+      )}
+      {isText && (
+        <div className="flex items-center h-full justify-center">
+          <Hint label="粗体" side="bottom" sideOffset={5}>
+            <Button
+              onClick={toggleBold}
+              size="icon"
+              variant="ghost"
+              className={cn(
+                properties.fontWeight > 500 && "bg-gray-100"
+              )}
+            >
+              <FaBold className="size-4" />
+            </Button>
+          </Hint>
+        </div>
+      )}
+      {isText && (
+        <div className="flex items-center h-full justify-center">
+          <Hint label="斜体" side="bottom" sideOffset={5}>
+            <Button
+              onClick={toggleItalic}
+              size="icon"
+              variant="ghost"
+              className={cn(
+                properties.fontStyle === "italic" && "bg-gray-100"
+              )}
+            >
+              <FaItalic className="size-4" />
+            </Button>
+          </Hint>
+        </div>
+      )}
+      {isText && (
+        <div className="flex items-center h-full justify-center">
+          <Hint label="下划线" side="bottom" sideOffset={5}>
+            <Button
+              onClick={toggleUnderline}
+              size="icon"
+              variant="ghost"
+              className={cn(
+                properties.fontUnderline && "bg-gray-100"
+              )}
+            >
+              <FaUnderline className="size-4" />
+            </Button>
+          </Hint>
+        </div>
+      )}
+      {isText && (
+        <div className="flex items-center h-full justify-center">
+          <Hint label="删除线" side="bottom" sideOffset={5}>
+            <Button
+              onClick={toggleLinethrough}
+              size="icon"
+              variant="ghost"
+              className={cn(
+                properties.fontLinethrough && "bg-gray-100"
+              )}
+            >
+              <FaStrikethrough className="size-4" />
+            </Button>
+          </Hint>
+        </div>
+      )}
+      {isText && (
+        <div className="flex items-center h-full justify-center">
+          <Hint label="左对齐" side="bottom" sideOffset={5}>
+            <Button
+              onClick={() => onChangeTextAlign("left")}
+              size="icon"
+              variant="ghost"
+              className={cn(
+                properties.textAlign === "left" && "bg-gray-100"
+              )}
+            >
+              <AlignLeft className="size-4" />
+            </Button>
+          </Hint>
+        </div>
+      )}
+      {isText && (
+        <div className="flex items-center h-full justify-center">
+          <Hint label="居中对齐" side="bottom" sideOffset={5}>
+            <Button
+              onClick={() => onChangeTextAlign("center")}
+              size="icon"
+              variant="ghost"
+              className={cn(
+                properties.textAlign === "center" && "bg-gray-100"
+              )}
+            >
+              <AlignCenter className="size-4" />
+            </Button>
+          </Hint>
+        </div>
+      )}
+      {isText && (
+        <div className="flex items-center h-full justify-center">
+          <Hint label="右对齐" side="bottom" sideOffset={5}>
+            <Button
+              onClick={() => onChangeTextAlign("right")}
+              size="icon"
+              variant="ghost"
+              className={cn(
+                properties.textAlign === "right" && "bg-gray-100"
+              )}
+            >
+              <AlignRight className="size-4" />
             </Button>
           </Hint>
         </div>

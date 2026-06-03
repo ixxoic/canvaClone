@@ -10,6 +10,7 @@ import { ToolSidebarHeader } from "./tool-sidebar-header";
 import { ToolSidebarClose } from "./tool-sidebar-close";
 
 import { useGetImages } from "@/features/images/api/use-get-images";
+import { UploadButton } from "@/lib/uploadthing";
 
 interface ImageSidebarProps {
   editor: Editor | undefined;  //TODO
@@ -39,6 +40,21 @@ export const ImageSidebar = ({
         title="图片"
         description="向画布添加图片"
       />
+      <div>
+        <UploadButton
+          appearance={{
+            button: "w-full text-sm font-medium",
+            allowedContent: "hidden"
+          }}
+          content={{
+            button: "点击上传",
+          }}
+          endpoint="imageUploader"
+          onClientUploadComplete={(res) => {
+            editor?.addImage?.(res[0].url);
+          }}
+        />
+      </div>
       {isLoading && (
         <div className="flex-1 flex items-center justify-center">
           <Loader className=" size-4 text-muted-foreground animate-spin" />

@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { BsBorderWidth } from "react-icons/bs";
 import { ArrowUp, ArrowDown, ChevronDown, AlignCenter, AlignLeft, AlignRight, Trash } from "lucide-react";
 import { RxTransparencyGrid } from "react-icons/rx";
+import { TbColorFilter } from "react-icons/tb";
 import { isTextType } from "../utils";
 import { FaBold, FaItalic, FaStrikethrough, FaUnderline } from "react-icons/fa";
 
@@ -59,6 +60,7 @@ export const Toolbar = ({
 
   //判断当前选择的对象是否为文本类型
   const isText = isTextType(selectedObjectType);
+  const isImage = selectedObjectType === "image";
 
   //修改字号大小
   const onChangeFontSize = (value: number) => {
@@ -151,23 +153,25 @@ export const Toolbar = ({
   return (
     <div className="shrink-0 h-[56px] border-b bg-white w-full flex
     items-center overflow-x-auto z-49 p-2 gap-x-2">
-      <div className="flex items-center h-full justify-center">
-        <Hint label="填充颜色" side="bottom" sideOffset={5}>
-          <Button
-            onClick={() => onChangeActiveTool("fill")}
-            size="icon"
-            variant="ghost"
-            className={cn(
-              activeTool === "fill" && "bg-gray-100"
-            )}
-          >
-            <div
-              className="rounded-sm size-4 border"
-              style={{ backgroundColor: properties.fillColor }}
-            />
-          </Button>
-        </Hint>
-      </div>
+      {!isImage && (
+        <div className="flex items-center h-full justify-center">
+          <Hint label="填充颜色" side="bottom" sideOffset={5}>
+            <Button
+              onClick={() => onChangeActiveTool("fill")}
+              size="icon"
+              variant="ghost"
+              className={cn(
+                activeTool === "fill" && "bg-gray-100"
+              )}
+            >
+              <div
+                className="rounded-sm size-4 border"
+                style={{ backgroundColor: properties.fillColor }}
+              />
+            </Button>
+          </Hint>
+        </div>
+      )}
       {!isText && (
         <div className="flex items-center h-full justify-center">
           <Hint label="描边颜色" side="bottom" sideOffset={5}>
@@ -341,6 +345,22 @@ export const Toolbar = ({
             value={properties.fontSize}
             onChange={onChangeFontSize}
           />
+        </div>
+      )}
+      {isImage && (
+        <div className="flex items-center h-full justify-center">
+          <Hint label="滤镜" side="bottom" sideOffset={5}>
+            <Button
+              onClick={() => onChangeActiveTool("filter")}
+              size="icon"
+              variant="ghost"
+              className={cn(
+                activeTool === "filter" && "bg-gray-100"
+              )}
+            >
+              <TbColorFilter className="size-4" />
+            </Button>
+          </Hint>
         </div>
       )}
       <div className="flex items-center h-full justify-center">

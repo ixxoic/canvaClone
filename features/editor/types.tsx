@@ -199,6 +199,9 @@ export type BuildEditorProps = {
 
 //BuildEditor要传出的类型
 export interface Editor {
+  autoZoom: () => void;
+  zoomIn: () => void;
+  zoomOut: () => void;
   getWorkspace: () => fabric.Object | undefined;
   changeSize: (value: { width: number; height: number }) => void;
   changeBackground: (value: string) => void;

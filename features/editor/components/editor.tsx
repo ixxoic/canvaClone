@@ -187,7 +187,7 @@ export const Editor = () => {
           >
           </Toolbar>
           <div className="h-[calc(100%-124px)] flex-1 bg-muted" ref={containerRef} />
-          <Footer />
+          <Footer editor={editor} />
         </main>
       </div>
     </div>

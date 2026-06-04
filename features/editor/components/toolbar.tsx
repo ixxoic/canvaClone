@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { FontSizeInput } from "./font-size-input";
 import { cn } from "@/lib/utils";
 import { BsBorderWidth } from "react-icons/bs";
-import { ArrowUp, ArrowDown, ChevronDown, AlignCenter, AlignLeft, AlignRight, Trash } from "lucide-react";
+import { ArrowUp, ArrowDown, ChevronDown, AlignCenter, AlignLeft, AlignRight, Trash, Copy } from "lucide-react";
 import { RxTransparencyGrid } from "react-icons/rx";
 import { TbColorFilter } from "react-icons/tb";
 import { isTextType } from "../utils";
@@ -394,6 +394,20 @@ export const Toolbar = ({
             className={cn(activeTool === "opacity" && "bg-gray-100")}
           >
             <RxTransparencyGrid className="size-4" />
+          </Button>
+        </Hint>
+      </div>
+      <div className="flex items-center h-full justify-center">
+        <Hint label="复制" side="bottom" sideOffset={5}>
+          <Button
+            onClick={() => {
+              editor?.onCopy();
+              editor?.onPaste();
+            }}
+            size="icon"
+            variant="ghost"
+          >
+            <Copy className="size-4" />
           </Button>
         </Hint>
       </div>

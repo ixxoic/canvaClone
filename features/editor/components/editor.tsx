@@ -17,32 +17,12 @@ import { TextSidebar } from "./text-sidebar";
 import { FontSidebar } from "./font-sidebar";
 import { ImageSidebar } from "./image-sidebar";
 import { FilterSidebar } from "./filter-sidebar";
+import { AiSidebar } from "./ai-sidebar";
+import { DrawSidebar } from "./draw-sidebar";
 
 export const Editor = () => {
 
   const [activeTool, setActiveTool] = useState<ActiveTool>("select");
-
-  //因为待会useEffect会用到onChangeActiveTool函数，所以需要将它记忆化
-  const onChangeActiveTool = useCallback((tool: ActiveTool) => {
-    // 再次点击同一项 → 收起面板，回到「选择」模式
-    if (tool === activeTool) {
-      if (activeTool === "draw") {
-        // TODO: 禁用绘画模式
-      }
-      setActiveTool("select");
-      return;
-    }
-
-    if (tool === "draw") {
-      // TODO: 启用绘画模式
-    }
-
-    if (activeTool === "draw") {
-      // TODO: 禁用绘画模式
-    }
-
-    setActiveTool(tool);
-  }, [activeTool]);
 
   //定义一个常量函数来处理清除选中状态
   const onClearSelection = useCallback(() => {
@@ -57,6 +37,26 @@ export const Editor = () => {
   const { init, editor } = useEditor({
     clearSelectionCallback: onClearSelection,
   });
+
+  //因为待会useEffect会用到onChangeActiveTool函数，所以需要将它记忆化
+  const onChangeActiveTool = useCallback((tool: ActiveTool) => {
+    // 再次点击同一项 → 收起面板，回到「选择」模式
+
+    if (tool === "draw") {
+      editor?.enableDrawingMode();
+    }
+
+    if (activeTool === "draw") {
+      editor?.disableDrawingMode();
+    }
+
+    if (tool === activeTool) {
+      return setActiveTool("select");
+    }
+
+    setActiveTool(tool);
+  }, [activeTool, editor]);
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   // 组件挂载后执行一次「初始化画布」；卸载或依赖变化时执行 return 里的清理
@@ -158,6 +158,16 @@ export const Editor = () => {
           onChangeActiveTool={onChangeActiveTool}
         />
         <FilterSidebar
+          editor={editor}
+          activeTool={activeTool}
+          onChangeActiveTool={onChangeActiveTool}
+        />
+        <AiSidebar
+          editor={editor}
+          activeTool={activeTool}
+          onChangeActiveTool={onChangeActiveTool}
+        />
+        <DrawSidebar
           editor={editor}
           activeTool={activeTool}
           onChangeActiveTool={onChangeActiveTool}

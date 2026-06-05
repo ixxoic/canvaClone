@@ -36,6 +36,7 @@ export const useHistory = ({ canvas }: useHistoryProps) => {
     }
 
     //TODO：保存回调函数
+    console.log("保存到数据库")
   }, [canvas]);
 
   const undo = useCallback(() => {

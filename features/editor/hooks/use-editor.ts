@@ -23,6 +23,7 @@ import {
 import { createFilter, isTextType } from "../utils";
 import { useClipboard } from "./use-clipboard";
 import { useHistory } from "./use-history";
+import { useHotKeys } from "./use-hotkeys";
 
 
 const buildEditor = ({
@@ -596,6 +597,15 @@ export const useEditor = ({
     setSelectedObjects,
     clearSelectionCallback,
   })
+
+  useHotKeys({
+    undo,
+    redo,
+    copy,
+    paste,
+    save,
+    canvas,
+  });
 
   //缓存编辑器实例
   const editor = useMemo(() => {

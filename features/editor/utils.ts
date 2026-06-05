@@ -1,6 +1,28 @@
 import { fabric } from "fabric";
-
 import { RGBColor } from "react-color"
+import { uuid } from "uuidv4";
+
+export function transformText(objects: any) {
+  if (!objects) return;
+
+  objects.forEach((item: any) => {
+    if (item.objects) {
+      transformText(item.objects);
+    } else {
+      item.type === "text" && (item.type === "textbox");
+    }
+  });
+};
+
+export function downloadFile(file: string, type: string) {
+  const anchorElement = document.createElement("a");
+
+  anchorElement.href = file;
+  anchorElement.download = `${uuid()}.${type}`;
+  document.body.appendChild(anchorElement);
+  anchorElement.click();
+  anchorElement.remove();
+}
 
 //判断当前选中的元素是否为文本类型，如果是的话那我们就不能修改描边，修改填充值才合理
 export function isTextType(type: string | undefined) {

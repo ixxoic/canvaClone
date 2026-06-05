@@ -17,13 +17,20 @@ import {
   TEXT_OPTIONS,
   FONT_FAMILY,
   FONT_WEIGHT,
-  FONT_SIZE
+  FONT_SIZE,
+  JSON_KEYS
 } from "../types";
 import { createFilter, isTextType } from "../utils";
 import { useClipboard } from "./use-clipboard";
+import { useHistory } from "./use-history";
 
 
 const buildEditor = ({
+  save,
+  undo,
+  redo,
+  canUndo,
+  canRedo,
   autoZoom,
   copy,
   paste,
@@ -67,6 +74,8 @@ const buildEditor = ({
   };
 
   return {
+    canUndo,
+    canRedo,
     autoZoom,
     getWorkspace,
 
@@ -95,14 +104,14 @@ const buildEditor = ({
 
       workspace?.set(value);
       autoZoom();
-      //TODO：保存
+      save();
     },
     changeBackground: (value: string) => {
       const workspace = getWorkspace();
 
       workspace?.set({ fill: value });
       canvas.renderAll();
-      //TODO：保存
+      save();
     },
     enableDrawingMode: () => {
       canvas.discardActiveObject();
@@ -112,6 +121,8 @@ const buildEditor = ({
     disableDrawingMode: () => {
       canvas.isDrawingMode = false;
     },
+    onUndo: () => undo(),
+    onRedo: () => redo(),
     onCopy: () => copy(),
     onPaste: () => paste(),
 
@@ -565,11 +576,22 @@ export const useEditor = ({
   const [strokeWidth, setStrokeWidth] = useState(STROKE_WIDTH);
   const [strokeDashArray, setStrokeDashArray] = useState<number[]>(STROKE_DASH_ARRAY);
 
+  const {
+    save,
+    canRedo,
+    canUndo,
+    redo,
+    undo,
+    canvasHistory,
+    setHistoryIndex
+  } = useHistory({ canvas });
+
   const { copy, paste } = useClipboard({ canvas });
 
   const { autoZoom } = useAutoResize({ canvas, container });
 
   useCanvasEvents({
+    save,
     canvas,
     setSelectedObjects,
     clearSelectionCallback,
@@ -579,6 +601,11 @@ export const useEditor = ({
   const editor = useMemo(() => {
     if (canvas) {
       return buildEditor({
+        save,
+        undo,
+        redo,
+        canUndo,
+        canRedo,
         autoZoom,
         copy,
         paste,
@@ -599,6 +626,11 @@ export const useEditor = ({
 
     return undefined;
   }, [
+    save,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
     autoZoom,
     copy,
     paste,
@@ -621,8 +653,18 @@ export const useEditor = ({
     }) => {
       setCanvas(nextCanvas);
       setContainer(nextContainer);
+
+      //将空画布作为历史数组的初始条目
+      const currentState = JSON.stringify(
+        nextCanvas.toJSON(JSON_KEYS)
+      );
+      canvasHistory.current = [currentState];
+      setHistoryIndex(0);
     },
-    [],
+    [
+      canvasHistory,
+      setHistoryIndex,
+    ]
   );
 
   return { init, canvas, container, editor };

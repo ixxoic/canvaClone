@@ -1,7 +1,7 @@
 "use client";
 
 import { Logo } from "@/features/editor/components/logo";
-import { ActiveTool } from "../types";
+import { ActiveTool, Editor } from "../types";
 import { cn } from "@/lib/utils";
 import { ChevronDown, Download, MousePointerClick, Redo2, Undo2 } from "lucide-react";
 import { CiFileOn } from "react-icons/ci";
@@ -17,11 +17,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface NavbarProps {
+  editor: Editor | undefined;
   activeTool: ActiveTool;
   onChangeActiveTool: (tool: ActiveTool) => void;
 }
 
 export const Navbar = ({
+  editor,
   activeTool,
   onChangeActiveTool
 }: NavbarProps) => {
@@ -58,12 +60,22 @@ export const Navbar = ({
           </Button>
         </Hint>
         <Hint label="撤销" side="bottom" sideOffset={10}>
-          <Button onClick={() => { }} variant="ghost" size="icon" className="">
+          <Button
+            disabled={!editor?.canUndo()}
+            onClick={() => editor?.onUndo()}
+            variant="ghost"
+            size="icon"
+          >
             <Undo2 className="size-4" />
           </Button>
         </Hint>
         <Hint label="重做" side="bottom" sideOffset={10}>
-          <Button onClick={() => { }} variant="ghost" size="icon" className="">
+          <Button
+            disabled={!editor?.canRedo()}
+            onClick={() => editor?.onRedo()}
+            variant="ghost"
+            size="icon"
+          >
             <Redo2 className="size-4" />
           </Button>
         </Hint>

@@ -2,6 +2,17 @@ import { fabric } from "fabric";
 import { ITextboxOptions } from "fabric/fabric-impl";
 import * as material from "material-colors";
 
+export const JSON_KEYS = [
+  "name",
+  "gradientAngle",
+  "selectable",
+  "hasControls",
+  "linkData",
+  "editable",
+  "extensionType",
+  "extension"
+]
+
 export const filters = [
   "none",
   "polaroid",
@@ -180,6 +191,11 @@ export interface EditorHookProps {
 
 //BuildEditor要传入的类型
 export type BuildEditorProps = {
+  save: (skip?: boolean) => void;
+  redo: () => void;
+  undo: () => void;
+  canUndo: () => boolean;
+  canRedo: () => boolean;
   autoZoom: () => void;
   copy: () => void;
   paste: () => void;
@@ -199,6 +215,10 @@ export type BuildEditorProps = {
 
 //BuildEditor要传出的类型
 export interface Editor {
+  onUndo: () => void;
+  onRedo: () => void;
+  canUndo: () => boolean;
+  canRedo: () => boolean;
   autoZoom: () => void;
   zoomIn: () => void;
   zoomOut: () => void;

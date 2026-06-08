@@ -35,7 +35,7 @@
         "unsplash-js": "^7.0.20",
         "uploadthing": "^7.7.4",
         "use-file-picker": "^2.1.4",
-        "uuidv4": "^6.2.13",
+        "uuid": "^8.3.2",
         "zod": "^4.4.3",
       },
       "devDependencies": {
@@ -47,6 +47,7 @@
         "@types/pg": "^8.20.0",
         "@types/react": "^19",
         "@types/react-dom": "^19",
+        "@types/uuid": "^8.3.4",
         "dotenv": "^17.4.2",
         "drizzle-kit": "^0.31.10",
         "eslint": "^9",
@@ -1692,8 +1693,6 @@
     "util-deprecate": ["util-deprecate@1.0.2", "https://registry.npmmirror.com/util-deprecate/-/util-deprecate-1.0.2.tgz", {}, "sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw=="],
 
     "uuid": ["uuid@8.3.2", "https://registry.npmmirror.com/uuid/-/uuid-8.3.2.tgz", { "bin": { "uuid": "dist/bin/uuid" } }, "sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg=="],
-
-    "uuidv4": ["uuidv4@6.2.13", "https://registry.npmmirror.com/uuidv4/-/uuidv4-6.2.13.tgz", { "dependencies": { "@types/uuid": "8.3.4", "uuid": "8.3.2" } }, "sha512-AXyzMjazYB3ovL3q051VLH06Ixj//Knx7QnUSi1T//Ie3io6CpsPu9nVMOx5MoLWh6xV0B9J0hIaxungxXUbPQ=="],
 
     "validate-npm-package-name": ["validate-npm-package-name@7.0.2", "https://registry.npmmirror.com/validate-npm-package-name/-/validate-npm-package-name-7.0.2.tgz", {}, "sha512-hVDIBwsRruT73PbK7uP5ebUt+ezEtCmzZz3F59BSr2F6OVFnJ/6h8liuvdLrQ88Xmnk6/+xGGuq+pG9WwTuy3A=="],
 

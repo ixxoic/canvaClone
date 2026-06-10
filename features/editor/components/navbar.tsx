@@ -16,6 +16,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { UserButton } from "@/features/auth/components/user-button";
 
 interface NavbarProps {
   editor: Editor | undefined;
@@ -149,8 +150,7 @@ export const Navbar = ({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {/*TODO: 添加用户按钮组件 */}
-
+          <UserButton />
         </div>
       </div >
     </nav >

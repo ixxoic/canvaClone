@@ -40,10 +40,12 @@ export const ImageSidebar = ({
         title="图片"
         description="向画布添加图片"
       />
-      <div>
+      <div className="p-4 pb-0">
         <UploadButton
+          className="w-full"
           appearance={{
-            button: "w-full text-sm font-medium",
+            container: "w-full",
+            button: "w-full h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90",
             allowedContent: "hidden"
           }}
           content={{

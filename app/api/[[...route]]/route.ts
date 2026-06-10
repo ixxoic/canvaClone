@@ -1,4 +1,4 @@
-import { Context, Hono } from "hono";
+import { Hono } from "hono";
 import { handle } from "hono/vercel";
 import { AuthConfig, initAuthConfig } from "@hono/auth-js";
 
@@ -10,10 +10,16 @@ import authConfig from "@/auth.config";
 
 export const runtime = "nodejs";
 
-function getAuthConfig(c: Context): AuthConfig {
+function getAuthConfig(): AuthConfig {
+  const secret = process.env.AUTH_SECRET;
+
+  if (!secret) {
+    throw new Error("Missing AUTH_SECRET");
+  }
+
   return {
-    secret: c.env.AUTH_SECRET,
-    ...authConfig as any
+    ...authConfig as any,
+    secret,
   }
 };
 

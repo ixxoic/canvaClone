@@ -1,9 +1,8 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
+import { auth } from "@/auth";
 
 const f = createUploadthing();
-
-const auth = (req: Request) => ({ id: "fakeId" }); // Fake auth function
 
 // FileRouter for your app, can contain multiple FileRoutes
 export const ourFileRouter = {
@@ -18,13 +17,12 @@ export const ourFileRouter = {
       maxFileCount: 1,
     },
   })
-    .middleware(async ({ req }) => {
-      //TODO: 这里的 auth 函数需要你自己实现，确保它能正确验证用户身份并返回用户信息
-      const user = await auth(req);
+    .middleware(async () => {
+      const session = await auth();
 
-      if (!user) throw new UploadThingError("Unauthorized");
+      if (!session?.user?.id) throw new UploadThingError("Unauthorized");
 
-      return { userId: user.id };
+      return { userId: session.user.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {
       console.log("Upload complete for userId:", metadata.userId);

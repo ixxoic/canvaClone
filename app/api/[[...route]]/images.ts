@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 
 import { unsplash } from "@/features/editor/lib/unsplash";
+import { verifyAuth } from "@hono/auth-js";
 
 //需要加载多少张图片
 const DEFAULT_COUNT = 50;
@@ -8,7 +9,7 @@ const DEFAULT_COUNT = 50;
 const DEFAULT_COLLECTION_IDS = ["317099"];
 
 const app = new Hono()
-  .get("/", async (c) => {
+  .get("/", verifyAuth(), async (c) => {
 
     const images = await unsplash.photos.getRandom({
       collectionIds: DEFAULT_COLLECTION_IDS,

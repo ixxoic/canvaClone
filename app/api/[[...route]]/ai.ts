@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 
 import llmConfig from "@/config/llmConfig";
+import { verifyAuth } from "@hono/auth-js";
 
 type ImageGenerationResponse = {
   data?: Array<{
@@ -43,6 +44,7 @@ const getImageBlob = async (image: string, origin: string) => {
 const app = new Hono()
   .post(
     "/remove-bg",
+    verifyAuth(),
     zValidator(
       "json",
       z.object({
@@ -117,6 +119,7 @@ const app = new Hono()
   )
   .post(
     "/generate-image",
+    verifyAuth(),
     zValidator(
       "json",
       z.object({

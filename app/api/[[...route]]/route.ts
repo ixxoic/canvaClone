@@ -1,13 +1,25 @@
-import { Hono } from "hono";
+import { Context, Hono } from "hono";
 import { handle } from "hono/vercel";
+import { AuthConfig, initAuthConfig } from "@hono/auth-js";
 
 import ai from "./ai";
 import users from "./users";
 import images from "./images";
 
+import authConfig from "@/auth.config";
+
 export const runtime = "nodejs";
 
+function getAuthConfig(c: Context): AuthConfig {
+  return {
+    secret: c.env.AUTH_SECRET,
+    ...authConfig as any
+  }
+};
+
 const app = new Hono().basePath("/api");
+
+app.use("*", initAuthConfig(getAuthConfig));
 
 const routes = app
   .route("/images", images)

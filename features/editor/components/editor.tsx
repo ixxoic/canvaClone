@@ -22,7 +22,13 @@ import { DrawSidebar } from "./draw-sidebar";
 import { SettingsSidebar } from "./settings-sidebar";
 import { RemoveBgSidebar } from "./remove-bg-sidebar";
 
-export const Editor = () => {
+import { ResponseType } from "@/features/images/api/use-get-images";
+
+interface EditorProps {
+  initialData: ResponseType["data"];
+}
+
+export const Editor = ({ initialData }: EditorProps) => {
 
   const [activeTool, setActiveTool] = useState<ActiveTool>("select");
 

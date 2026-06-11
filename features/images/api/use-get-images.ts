@@ -1,6 +1,9 @@
+import { InferResponseType } from "hono";
 import { useQuery } from "@tanstack/react-query";
 
 import { client } from "@/lib/hono";
+
+export type ResponseType = InferResponseType<typeof client.api.projects[":id"]["$get"], 200>
 
 export const useGetImages = () => {
   const query = useQuery({
@@ -9,7 +12,7 @@ export const useGetImages = () => {
       const response = await client.api.images.$get();
 
       if (!response.ok) {
-        throw new Error("Failed to fetch images");
+        throw new Error("获取图片失败");
       }
 
       const { data } = await response.json();

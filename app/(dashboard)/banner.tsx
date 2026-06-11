@@ -1,7 +1,32 @@
+"use client";
+
+import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button"
+
+import { useCreateProject } from "@/features/projects/api/use-create-project";
+
 import { ArrowRight, Sparkles } from "lucide-react"
 
 export const Banner = () => {
+  const router = useRouter();
+  const mutation = useCreateProject();
+
+  const onClick = () => {
+    mutation.mutate(
+      {
+        name: "未命名的项目",
+        json: "",
+        width: 900,
+        height: 1200,
+      },
+      {
+        onSuccess: ({ data }) => {
+          router.push(`/editor/${data.id}`);
+        }
+      }
+    )
+  }
+
   return (
     <div className="aspect-[5/1] min-h-[248px] flex gap-x-6 p-6 items-center rounded-xl
     bg-gradient-to-r from-[#2e62cb] via-[#0073ff] to-[#3faff5] text-white">
@@ -19,6 +44,8 @@ export const Banner = () => {
           瞬间将灵感转化为设计，只需上传图片让AI完成剩下的工作
         </p>
         <Button
+          disabled={mutation.isPending}
+          onClick={onClick}
           variant="secondary"
           className="w-[160px]"
         >

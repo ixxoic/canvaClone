@@ -9,6 +9,35 @@ import { projects, projectsInsertSchema } from "@/db/schema";
 import { error } from "console";
 
 const app = new Hono()
+  .delete(
+    "/:id",
+    verifyAuth(),
+    zValidator("param", z.object({ id: z.string() })),
+    async (c) => {
+      const auth = c.get("authUser");
+      const { id } = c.req.valid("param");
+
+      if (!auth.token?.id) {
+        return c.json({ error: "为授权" }, 401);
+      }
+
+      const data = await db
+        .delete(projects)
+        .where(
+          and(
+            eq(projects.id, id),
+            eq(projects.userId, auth.token.id),
+          ),
+        )
+        .returning();
+
+      if (data.length === 0) {
+        return c.json({ error: "未找到" }, 404)
+      }
+
+      return c.json({ data: { id } });
+    }
+  )
   .post(
     "/:id/duplicate",
     verifyAuth(),

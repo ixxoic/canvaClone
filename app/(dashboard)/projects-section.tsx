@@ -4,6 +4,8 @@ import React from "react";
 import { formatDistanceToNow } from "data-fns";
 import { useRouter } from "next/navigation";
 import { useGetProjects } from "@/features/projects/api/use-get-projects";
+import { useDeleteProject } from "@/features/projects/api/use-delete-project";
+import { useConfirm } from "@/hooks/use-confirm";
 import { useDuplicateProject } from "@/features/projects/api/use-duplicate-project";
 
 import {
@@ -22,10 +24,24 @@ import { AlertTriangle, CopyIcon, FileIcon, Loader, MoreHorizontal, Search, Tras
 import { Button } from "@/components/ui/button";
 
 export const ProjectsSection = () => {
+  const [ConfirmDialog, confirm] = useConfirm(
+    "你确定吗？",
+    "你将删除这个项目",
+  );
+
   const duplicateMutation = useDuplicateProject();
+  const removeMutation = useDeleteProject();
 
   const onCopy = (id: string) => {
     duplicateMutation.mutate({ id });
+  }
+
+  const onDelete = async (id: string) => {
+    const ok = await confirm();
+
+    if (ok) {
+      removeMutation.mutate({ id })
+    }
   }
 
   const router = useRouter();
@@ -67,7 +83,10 @@ export const ProjectsSection = () => {
     )
   }
 
-  if (!data.pages.length) {
+  if (
+    !data.pages.length ||
+    !data.pages[0].data.length
+  ) {
     return (
       <div className="space-y-4">
         <h3 className="font-semibold text-lg">
@@ -85,6 +104,7 @@ export const ProjectsSection = () => {
 
   return (
     <div className="space-y-4">
+      <ConfirmDialog />
       <h3 className="font-semibold text-lg">
         最近的项目
       </h3>
@@ -137,8 +157,8 @@ export const ProjectsSection = () => {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="h-10 cursor-pointer"
-                          disabled={false}
-                          onClick={() => { }}
+                          disabled={removeMutation.isPending}
+                          onClick={() => onDelete(project.id)}
                         >
                           <Trash className="size-4 mr-2" />
                           删除

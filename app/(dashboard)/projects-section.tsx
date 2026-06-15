@@ -4,6 +4,7 @@ import React from "react";
 import { formatDistanceToNow } from "data-fns";
 import { useRouter } from "next/navigation";
 import { useGetProjects } from "@/features/projects/api/use-get-projects";
+import { useDuplicateProject } from "@/features/projects/api/use-duplicate-project";
 
 import {
   Table,
@@ -21,6 +22,12 @@ import { AlertTriangle, CopyIcon, FileIcon, Loader, MoreHorizontal, Search, Tras
 import { Button } from "@/components/ui/button";
 
 export const ProjectsSection = () => {
+  const duplicateMutation = useDuplicateProject();
+
+  const onCopy = (id: string) => {
+    duplicateMutation.mutate({ id });
+  }
+
   const router = useRouter();
 
   const {
@@ -122,8 +129,8 @@ export const ProjectsSection = () => {
                       <DropdownMenuContent align="end" className="w-60">
                         <DropdownMenuItem
                           className="h-10 cursor-pointer"
-                          disabled={false}
-                          onClick={() => { }}
+                          disabled={duplicateMutation.isPending}
+                          onClick={() => onCopy(project.id)}
                         >
                           <CopyIcon className="size-4 mr-2" />
                           复制一份

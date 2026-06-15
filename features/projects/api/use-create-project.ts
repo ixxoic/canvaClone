@@ -1,6 +1,6 @@
 import { toast } from "sonner";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InferRequestType, InferResponseType } from "hono";
 
 import { client } from "@/lib/hono";
@@ -9,6 +9,8 @@ type ResponseType = InferResponseType<typeof client.api.projects["$post"], 200>;
 type RequestType = InferRequestType<typeof client.api.projects["$post"]>["json"];
 
 export const useCreateProject = () => {
+  const queryClient = useQueryClient();
+
   const mutation = useMutation<
     ResponseType,
     Error,
@@ -27,6 +29,7 @@ export const useCreateProject = () => {
       toast.success("项目创建成功");
 
       //TODO: Invalidate "projects" query
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
     onError: () => {
       toast.error("项目创建失败")

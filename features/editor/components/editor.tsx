@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { fabric } from "fabric";
+import debounce from "lodash.debounce";
+
 import { useEditor } from "@/features/editor/hooks/use-editor";
 import { Navbar } from "@/features/editor/components/navbar";
 import { Sidebar } from "@/features/editor/components/sidebar";
@@ -23,12 +25,27 @@ import { SettingsSidebar } from "./settings-sidebar";
 import { RemoveBgSidebar } from "./remove-bg-sidebar";
 
 import { ResponseType } from "@/features/images/api/use-get-images";
+import { useUpdateProject } from "@/features/projects/api/use-update-project";
 
 interface EditorProps {
   initialData: ResponseType["data"];
 }
 
 export const Editor = ({ initialData }: EditorProps) => {
+  const mutate = useUpdateProject(initialData.id);
+
+  //防抖的保存方法
+  const debouncedSave = useCallback(
+    debounce(
+      (values: {
+        json: string,
+        height: number,
+        width: number
+      }) => {
+        mutate(values);
+      },
+      500
+    ), [mutate])
 
   const [activeTool, setActiveTool] = useState<ActiveTool>("select");
 
@@ -43,7 +60,11 @@ export const Editor = ({ initialData }: EditorProps) => {
 
   //拿到画布初始化函数和编辑器实例
   const { init, editor } = useEditor({
+    defaultState: initialData.json,
+    defaultWidth: initialData.width,
+    defaultHeight: initialData.height,
     clearSelectionCallback: onClearSelection,
+    saveCallback: debouncedSave,
   });
 
   //因为待会useEffect会用到onChangeActiveTool函数，所以需要将它记忆化
@@ -117,6 +138,7 @@ export const Editor = ({ initialData }: EditorProps) => {
   return (
     <div className="h-full flex flex-col">
       <Navbar
+        id={initialData.id}
         editor={editor}
         activeTool={activeTool}
         onChangeActiveTool={onChangeActiveTool}

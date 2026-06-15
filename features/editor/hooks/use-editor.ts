@@ -1,4 +1,4 @@
-import { useCallback, useState, useMemo } from "react";
+import { useCallback, useState, useMemo, useRef } from "react";
 import { fabric } from "fabric";
 import { useAutoResize } from "./use-auto-resize";
 import { useCanvasEvents } from "./use-canvas-events";
@@ -25,6 +25,7 @@ import { useClipboard } from "./use-clipboard";
 import { useHistory } from "./use-history";
 import { useHotKeys } from "./use-hotkeys";
 import { useWindowEvents } from "./use-window-events";
+import { useLoadState } from "./use-load-state";
 
 
 const buildEditor = ({
@@ -633,8 +634,17 @@ const buildEditor = ({
 };
 
 export const useEditor = ({
-  clearSelectionCallback
+  defaultState,
+  defaultWidth,
+  defaultHeight,
+  clearSelectionCallback,
+  saveCallback
 }: EditorHookProps) => {
+  //?我们为什么要用useRef存储这些值
+  const initialState = useRef(defaultState);
+  const initialWidth = useRef(defaultWidth);
+  const initialHeight = useRef(defaultHeight);
+
   const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
   //存储我们当前选择的对象类型，根据它是图片/文本来选择显示上方工具栏
@@ -657,7 +667,10 @@ export const useEditor = ({
     undo,
     canvasHistory,
     setHistoryIndex
-  } = useHistory({ canvas });
+  } = useHistory({
+    canvas,
+    saveCallback
+  });
 
   const { copy, paste } = useClipboard({ canvas });
 
@@ -678,6 +691,14 @@ export const useEditor = ({
     save,
     canvas,
   });
+
+  useLoadState({
+    canvas,
+    autoZoom,
+    initialState,
+    canvasHistory,
+    setHistoryIndex,
+  })
 
   //缓存编辑器实例
   const editor = useMemo(() => {

@@ -4,9 +4,14 @@ import { JSON_KEYS } from "../types";
 
 interface useHistoryProps {
   canvas: fabric.Canvas | null;
+  saveCallback?: (values: {
+    json: string;
+    height: number;
+    width: number;
+  }) => void;
 }
 
-export const useHistory = ({ canvas }: useHistoryProps) => {
+export const useHistory = ({ canvas, saveCallback }: useHistoryProps) => {
 
   //用于渲染特定的状态，比如判断是否可以撤销或重做
   const [historyIndex, setHistoryIndex] = useState(0);
@@ -36,7 +41,14 @@ export const useHistory = ({ canvas }: useHistoryProps) => {
     }
 
     //TODO：保存回调函数
-    console.log("保存到数据库")
+    const workspace = canvas
+      .getObjects()
+      .find((object) => object.name === "clip");
+
+    const height = workspace?.height || 0;
+    const width = workspace?.width || 0;
+
+    saveCallback?.({ json, height, width });
   }, [canvas]);
 
   const undo = useCallback(() => {

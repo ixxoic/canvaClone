@@ -1,5 +1,8 @@
 //点击AI展开的侧边栏
 import { useState } from "react";
+
+import { usePaywall } from "@/features/subscriptions/hooks/use-paywall";
+
 import { ActiveTool, Editor } from "../types";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +24,7 @@ export const AiSidebar = ({
   activeTool,
   onChangeActiveTool
 }: AiSidebarProps) => {
+  const { shouldBlock, triggerPaywall } = usePaywall();
   const mutation = useGenerateImage();
 
   const [value, setValue] = useState("");
@@ -30,7 +34,10 @@ export const AiSidebar = ({
   ) => {
     e.preventDefault();
 
-    //TODO: 支付墙
+    if (shouldBlock) {
+      triggerPaywall();
+      return;
+    }
 
     mutation.mutate({ prompt: value }, {
       onSuccess: (data) => {

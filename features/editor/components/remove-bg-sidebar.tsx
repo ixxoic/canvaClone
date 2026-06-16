@@ -4,6 +4,8 @@ import Image from "next/image";
 import { ActiveTool, Editor } from "../types";
 import { cn } from "@/lib/utils";
 
+import { usePaywall } from "@/features/subscriptions/hooks/use-paywall";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { ToolSidebarHeader } from "./tool-sidebar-header";
@@ -22,6 +24,8 @@ export const RemoveBgSidebar = ({
   activeTool,
   onChangeActiveTool
 }: RemoveBgSidebarProps) => {
+  const { shouldBlock, triggerPaywall } = usePaywall();
+
   const mutation = useRemoveBg();
   //获取选中的对象
   const selectedObject = editor?.selectedObjects[0];
@@ -36,7 +40,10 @@ export const RemoveBgSidebar = ({
   }
 
   const onClick = () => {
-    //TODO：支付墙拦截
+    if (shouldBlock) {
+      triggerPaywall();
+      return;
+    }
 
     mutation.mutate({
       image: imageSrc,

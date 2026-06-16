@@ -3,12 +3,15 @@
 import { ResponseType, useGetTemplates } from "@/features/projects/api/use-get-templates";
 import { useCreateProject } from "@/features/projects/api/use-create-project";
 
+import { usePaywall } from "@/features/subscriptions/hooks/use-paywall";
+
 import { Loader, TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { TemplateCard } from "./template-card";
 
 export const TemplatesSection = () => {
+  const paywall = usePaywall();
   const router = useRouter();
   const mutation = useCreateProject();
 
@@ -20,6 +23,11 @@ export const TemplatesSection = () => {
 
   const onClick = (template: ResponseType["data"][0]) => {
     //检查模板是否为pro
+    if (template.isPro && paywall.shouldBlock) {
+      paywall.triggerPaywall();
+      return;
+    }
+
 
     mutation.mutate(
       {

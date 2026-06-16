@@ -5,6 +5,7 @@ import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
 import { Toaster } from "sonner";
 import { Providers } from "@/components/providers";
+import { Modals } from "@/components/modals";
 
 import "./globals.css";
 import { Session } from "inspector/promises";
@@ -40,6 +41,7 @@ export default async function RootLayout({
         <body className="min-h-full flex flex-col">
           <Providers>
             <Toaster />
+            <Modals />
             {children}
           </Providers>
         </body>

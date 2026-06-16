@@ -6,6 +6,7 @@ import ai from "./ai";
 import users from "./users";
 import images from "./images";
 import projects from "./projects";
+import subscriptions from "./subscriptions";
 
 import authConfig from "@/auth.config";
 
@@ -32,7 +33,8 @@ const routes = app
   .route("/images", images)
   .route("/users", users)
   .route("/ai", ai)
-  .route("/projects", projects);
+  .route("/projects", projects)
+  .route("/subscriptions", subscriptions)
 
 //用hono的handle函数将app处理成一个可以在vercel上运行的函数，并导出GET方法，使其成为一个API路由。
 export const GET = handle(app);

@@ -14,9 +14,11 @@ import { Separator } from "@/components/ui/separator";
 
 import { useSubscriptionModal } from "../store/use-subscription-modal";
 import { CheckCircle2 } from "lucide-react";
+import { useCheckout } from "../api/use-checkout";
 import { Button } from "@/components/ui/button";
 
 export const SubscriptionModal = () => {
+  const mutation = useCheckout();
   const { isOpen, onClose } = useSubscriptionModal();
 
   return (
@@ -66,8 +68,8 @@ export const SubscriptionModal = () => {
         <DialogFooter className="pt-2 mt-4 gap-y-2">
           <Button
             className="w-full"
-            onClick={() => { }}
-            disabled={false}
+            onClick={() => mutation.mutate()}
+            disabled={mutation.isPending}
           >
             升级
           </Button>

@@ -8,7 +8,7 @@ import { Providers } from "@/components/providers";
 import { Modals } from "@/components/modals";
 
 import "./globals.css";
-import { Session } from "inspector/promises";
+import { SubscriptionAlert } from "@/features/subscriptions/components/subscription-alert";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,6 +42,7 @@ export default async function RootLayout({
           <Providers>
             <Toaster />
             <Modals />
+            <SubscriptionAlert />
             {children}
           </Providers>
         </body>

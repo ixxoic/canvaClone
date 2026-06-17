@@ -4,7 +4,6 @@ import { CreditCard, Crown, Home, MessageCircleQuestion } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import { usePaywall } from "@/features/subscriptions/hooks/use-paywall";
-import { useCheckout } from "@/features/subscriptions/api/use-checkout";
 import { useBilling } from "@/features/subscriptions/api/use-billing";
 
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,6 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarItem } from "./sidebar-item";
 
 export const SidebarRouts = () => {
-  const mutation = useCheckout();
   const billingMutation = useBilling();
   const { shouldBlock, triggerPaywall, isLoading } = usePaywall();
 
@@ -33,8 +31,7 @@ export const SidebarRouts = () => {
         <>
           <div className="px-3">
             <Button
-              onClick={() => mutation.mutate()}
-              disabled={mutation.isPending}
+              onClick={triggerPaywall}
               className="w-full rounded-xl border-none hover:bg-white
           hover:opacity-75 transition"
               variant="outline"

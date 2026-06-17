@@ -66,23 +66,31 @@ const app = new Hono()
     }
 
     //创建一个结账会话
-    const session = await stripe.checkout.sessions.create({
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}?success=1`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}?canceled=1`,
-      payment_method_types: ["card", "alipay"],
-      mode: "subscription",
-      billing_address_collection: "auto",
-      customer_email: auth.token.email || "",
-      line_items: [
-        {
-          price: process.env.STRIPE_PRICE_ID,
-          quantity: 1,
+    let session: Stripe.Checkout.Session;
+
+    try {
+      session = await stripe.checkout.sessions.create({
+        success_url: `${process.env.NEXT_PUBLIC_APP_URL}?success=1`,
+        cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}?canceled=1`,
+        payment_method_types: ["card"],
+        mode: "subscription",
+        billing_address_collection: "auto",
+        customer_email: auth.token.email || "",
+        line_items: [
+          {
+            price: process.env.STRIPE_PRICE_ID,
+            quantity: 1,
+          },
+        ],
+        metadata: {
+          userId: auth.token.id,
         },
-      ],
-      metadata: {
-        userId: auth.token.id,
-      },
-    });
+      });
+    } catch (error) {
+      console.error("[subscriptions.checkout]", error);
+
+      return c.json({ error: "创建会话失败" }, 400);
+    }
 
     const url = session.url;
 

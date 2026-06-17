@@ -33,7 +33,7 @@ interface EditorProps {
 }
 
 export const Editor = ({ initialData }: EditorProps) => {
-  const mutate = useUpdateProject(initialData.id);
+  const { mutate } = useUpdateProject(initialData.id);
 
   //防抖的保存方法
   const debouncedSave = useCallback(

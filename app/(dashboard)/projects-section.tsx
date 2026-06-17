@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { formatDistanceToNow } from "data-fns";
 import { useRouter } from "next/navigation";
 import { useGetProjects } from "@/features/projects/api/use-get-projects";
 import { useDeleteProject } from "@/features/projects/api/use-delete-project";
@@ -22,6 +21,37 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AlertTriangle, CopyIcon, FileIcon, Loader, MoreHorizontal, Search, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+const getRelativeTime = (date: string | number | Date) => {
+  const targetTime = new Date(date).getTime();
+
+  if (Number.isNaN(targetTime)) {
+    return "未知时间";
+  }
+
+  const diffInSeconds = Math.round((targetTime - Date.now()) / 1000);
+  const units: Array<[Intl.RelativeTimeFormatUnit, number]> = [
+    ["year", 60 * 60 * 24 * 365],
+    ["month", 60 * 60 * 24 * 30],
+    ["week", 60 * 60 * 24 * 7],
+    ["day", 60 * 60 * 24],
+    ["hour", 60 * 60],
+    ["minute", 60],
+    ["second", 1],
+  ];
+
+  const formatter = new Intl.RelativeTimeFormat("zh-CN", {
+    numeric: "auto",
+  });
+
+  for (const [unit, secondsInUnit] of units) {
+    if (Math.abs(diffInSeconds) >= secondsInUnit || unit === "second") {
+      return formatter.format(Math.round(diffInSeconds / secondsInUnit), unit);
+    }
+  }
+
+  return "未知时间";
+}
 
 export const ProjectsSection = () => {
   const [ConfirmDialog, confirm] = useConfirm(
@@ -123,17 +153,15 @@ export const ProjectsSection = () => {
                   </TableCell>
                   <TableCell
                     onClick={() => router.push(`/editor/${project.id}`)}
-                    className="hidden md:table-cell cursor-pointer"
+                    className="max-md:hidden table-cell cursor-pointer"
                   >
                     {project.width} x {project.height} px
                   </TableCell>
                   <TableCell
                     onClick={() => router.push(`/editor/${project.id}`)}
-                    className="hidden md:table-cell cursor-pointer"
+                    className="max-md:hidden table-cell cursor-pointer"
                   >
-                    {formatDistanceToNow(project.updatedAt, {
-                      addSuffix: true,
-                    })}
+                    {getRelativeTime(project.updatedAt)}
                   </TableCell>
                   <TableCell className="flex items-center justify-end">
                     <DropdownMenu modal={false}>

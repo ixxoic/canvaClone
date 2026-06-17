@@ -34,7 +34,7 @@ export default {
     Credentials({
       credentials: {
         email: { label: "Email", type: "email" },
-        pasword: { label: "Password", type: "password" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         //接收凭证信息
@@ -83,6 +83,16 @@ export default {
     strategy: "jwt",
   },
   callbacks: {
+    authorized({ auth, request }) {
+      const { pathname } = request.nextUrl;
+      const isAuthPage = pathname === "/sign-in" || pathname === "/sign-up";
+
+      if (isAuthPage) {
+        return true;
+      }
+
+      return !!auth?.user;
+    },
     session({ session, token }) {
       if (token.id) {
         session.user.id = token.id;

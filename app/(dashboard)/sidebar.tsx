@@ -3,7 +3,7 @@ import { SidebarRouts } from "./sidebar-routes";
 
 export const Sidebar = () => {
   return (
-    <aside className="hidden lg:flex fixed flex-col w-[300px] left-0 shrink-0 h-full">
+    <aside className="max-md:hidden flex fixed inset-y-0 left-0 z-30 flex-col w-[300px] shrink-0 bg-muted">
       <Logo />
       <SidebarRouts />
     </aside>

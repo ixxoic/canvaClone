@@ -4,7 +4,7 @@ import { useFilePicker } from "use-file-picker";
 import { Logo } from "@/features/editor/components/logo";
 import { ActiveTool, Editor } from "../types";
 import { cn } from "@/lib/utils";
-import { ChevronDown, Download, MousePointerClick, Redo2, Undo2 } from "lucide-react";
+import { ChevronDown, Download, Loader, MousePointerClick, Redo2, Undo2 } from "lucide-react";
 import { CiFileOn } from "react-icons/ci";
 import { BsCloudCheck, BsCloudSlash } from "react-icons/bs";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,7 @@ export const Navbar = ({
       mutationKey: ["project", { id }],
       exact: true,
     },
-    select: { mutation } => mutation.state.status,
+    select: (mutation) => mutation.state.status,
   });
 
 const currentStatus = data[data.length - 1];

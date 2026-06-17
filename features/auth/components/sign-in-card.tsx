@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { signIn } from "next-auth/react"
 import { FaGithub, FaGoogle } from "react-icons/fa"
+import { TriangleAlert } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,32 +18,51 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useSearchParams } from "next/navigation";
-import { TriangleAlert } from "lucide-react";
 
 export const SignInCard = () => {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isPending, setIsPending] = useState(false);
+  const [credentialError, setCredentialError] = useState<string | null>(null);
 
   //获取url中的错误信息
   const params = useSearchParams();
   const error = params.get("error");
 
   //表单处理函数
-  const onCredentialSignIn = (
+  const onCredentialSignIn = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
+    setIsPending(true);
+    setCredentialError(null);
 
-    signIn("credentials", {
-      email: email,
-      password: password,
-      callbackUrl: "/"
-    });
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+        redirectTo: "/"
+      });
+
+      if (!result?.ok || !result.url) {
+        setCredentialError("邮箱或密码无效");
+        return;
+      }
+
+      const redirectUrl = new URL(result.url, window.location.origin);
+      router.push(`${redirectUrl.pathname}${redirectUrl.search}${redirectUrl.hash}`);
+      router.refresh();
+    } catch {
+      setCredentialError("登录失败，请稍后重试");
+    } finally {
+      setIsPending(false);
+    }
   };
 
   const onProviderSignIn = (provider: "github" | "google") => {
-    signIn(provider, { callbackUrl: "/" })
+    signIn(provider, { redirectTo: "/" })
   }
 
 
@@ -55,16 +76,17 @@ export const SignInCard = () => {
           使用您的邮箱或其他服务继续登录
         </CardDescription>
       </CardHeader>
-      {!!error && (
+      {(!!error || !!credentialError) && (
         <div className="bg-destructive/15 p-3 rounded-md flex items-center gap-x-2
         text-sm text-destructive mb-6">
           <TriangleAlert className="size-4" />
-          <p>邮箱或密码无效</p>
+          <p>{credentialError || "邮箱或密码无效"}</p>
         </div>
       )}
       <CardContent className="space-y-5 px-0 pb-0">
         <form onSubmit={onCredentialSignIn} className="space-y-2.5">
           <Input
+            disabled={isPending}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="邮箱"
@@ -72,14 +94,15 @@ export const SignInCard = () => {
             required
           />
           <Input
+            disabled={isPending}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="密码"
             type="password"
             required
           />
-          <Button type="submit" className="w-full" size="lg">
-            继续
+          <Button disabled={isPending} type="submit" className="w-full" size="lg">
+            {isPending ? "登录中..." : "继续"}
           </Button>
         </form>
         <Separator />

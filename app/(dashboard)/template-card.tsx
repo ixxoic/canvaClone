@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Crown } from "lucide-react";
 
 interface TemplateCardProps {
-  imageSrc: string;
+  imageSrc?: string | null;
   title: string;
   onClick: () => void;
   disabled?: boolean;
@@ -26,7 +26,7 @@ export const TemplateCard = ({
 }: TemplateCardProps) => {
   return (
     <button
-      onClick={() => onClick}
+      onClick={onClick}
       disabled={disabled}
       className={cn(
         "space-y-2 group text-left transition flex flex-col",
@@ -37,12 +37,20 @@ export const TemplateCard = ({
         style={{ aspectRatio: `${width}/${height}` }}
         className="relative rounded-xl h-full w-full overflow-hidden border"
       >
-        <Image
-          fill
-          src={imageSrc}
-          alt={title}
-          className="object-cover transition transform group-hover:scale-105"
-        />
+        {imageSrc ? (
+          <Image
+            fill
+            src={imageSrc}
+            alt={title}
+            unoptimized
+            sizes="(max-width: 768px) 50vw, 25vw"
+            className="object-cover transition transform group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-muted px-3 text-center text-xs text-muted-foreground">
+            暂无缩略图
+          </div>
+        )}
         {isPro && (
           <div className="absolute top-2 right-2 h-10 w-10 flex items-center justify-center bg-black/50 rounded-full -z[10]"
           >

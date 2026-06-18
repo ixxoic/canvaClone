@@ -26,10 +26,11 @@ export const FailModal = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent>
+      <DialogContent className="!top-1/2 !-translate-y-1/2">
         <DialogHeader>
           <Image
-            src="./logo.svg"
+            className="mx-auto"
+            src="/logo.svg"
             alt="Logo"
             width={36}
             height={36}

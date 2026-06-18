@@ -87,12 +87,20 @@ export const TemplateSidebar = ({
                   className="relative w-full group hover:opacity-75
                 transition bg-muted rounded-md overflow-hidden border"
                 >
-                  <Image
-                    fill
-                    src={template.thumbnaiUrl || ""}
-                    alt={template.name || "Template"}
-                    className="object-cover"
-                  />
+                  {template.thumbnaiUrl ? (
+                    <Image
+                      fill
+                      src={template.thumbnaiUrl}
+                      alt={template.name || "Template"}
+                      unoptimized
+                      sizes="180px"
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center px-3 text-center text-xs text-muted-foreground">
+                      暂无缩略图
+                    </div>
+                  )}
                   {template.isPro && (
                     <div className="absolute top-2 right-2 size-8 items-center flex justify-center bg-black/50 rounded-full">
                       <Crown className="size-4 fill-yellow-500 text-yellow-500" />

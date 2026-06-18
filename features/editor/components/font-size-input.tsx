@@ -15,12 +15,18 @@ export const FontSizeInput = ({
 
   const increment = () => onChange(value + 1);
   const decrement = () => onChange(value - 1);
+  const displayValue = Number.isFinite(value) ? value : "";
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const value = parseInt(e.target.value, 10);
-    onChange(value);
+    const nextValue = parseInt(e.target.value, 10);
+
+    if (Number.isNaN(nextValue)) {
+      return;
+    }
+
+    onChange(nextValue);
   }
 
   return (
@@ -36,7 +42,7 @@ export const FontSizeInput = ({
 
       <Input
         onChange={handleChange}
-        value={value}
+        value={displayValue}
         type="number"
         className="w-[50px] h-8 rounded-none border-y-0 border-x border-border bg-transparent text-center focus-visible:ring-0 focus-visible:ring-offset-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
       />

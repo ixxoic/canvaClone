@@ -85,7 +85,7 @@ export const TemplatesSection = () => {
           <TemplateCard
             key={template.id}
             title={template.name}
-            imageSrc={template.thumbnaiUrl || ""}
+            imageSrc={template.thumbnaiUrl}
             onClick={() => onClick(template)}
             disabled={mutation.isPending}
             description={`${template.width} x ${template.height} px`}

@@ -12,6 +12,10 @@ type ImageGenerationResponse = {
   }>;
 };
 
+const parseImageGenerationResponse = async (response: Response) => {
+  return await response.json() as ImageGenerationResponse;
+};
+
 const getImageUrl = (result: ImageGenerationResponse) => {
   const image = result.data?.[0];
 
@@ -98,7 +102,7 @@ const app = new Hono()
           );
         }
 
-        const result = await response.json<ImageGenerationResponse>();
+        const result = await parseImageGenerationResponse(response);
         const imageUrl = getImageUrl(result);
 
         if (!imageUrl) {
@@ -129,42 +133,52 @@ const app = new Hono()
     async (c) => {
       const { prompt } = c.req.valid("json");
 
-      const response = await fetch(`${llmConfig.baseURL}/images/generations`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${llmConfig.apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "gpt-image-2",
-          prompt,
-          n: 1,
-          size: "1024x1024",
-        }),
-      });
+      try {
+        const response = await fetch(`${llmConfig.baseURL}/images/generations`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${llmConfig.apiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "gpt-image-2",
+            prompt,
+            n: 1,
+            size: "1024x1024",
+          }),
+        });
 
-      if (!response.ok) {
-        const errorText = await response.text();
+        if (!response.ok) {
+          const errorText = await response.text();
 
+          return c.json(
+            {
+              error: "图片生成失败",
+              status: response.status,
+              statusText: response.statusText,
+              detail: errorText || "上游接口没有返回错误详情",
+            },
+            500,
+          );
+        }
+
+        const result = await parseImageGenerationResponse(response);
+        const imageUrl = getImageUrl(result);
+
+        if (!imageUrl) {
+          return c.json({ error: "图片生成失败", detail: result }, 500);
+        }
+
+        return c.json({ url: imageUrl });
+      } catch (error) {
         return c.json(
           {
             error: "图片生成失败",
-            status: response.status,
-            statusText: response.statusText,
-            detail: errorText || "上游接口没有返回错误详情",
+            detail: error instanceof Error ? error.message : "未知错误",
           },
           500,
         );
       }
-
-      const result = await response.json<ImageGenerationResponse>();
-      const imageUrl = getImageUrl(result);
-
-      if (!imageUrl) {
-        return c.json({ error: "图片生成失败", detail: result }, 500);
-      }
-
-      return c.json({ url: imageUrl });
     }
   )
 

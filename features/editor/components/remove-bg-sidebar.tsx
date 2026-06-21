@@ -40,6 +40,10 @@ export const RemoveBgSidebar = ({
   }
 
   const onClick = () => {
+    if (!imageSrc) {
+      return;
+    }
+
     if (shouldBlock) {
       triggerPaywall();
       return;

@@ -9,6 +9,63 @@ import { stripe } from "@/lib/stripe";
 import { db } from "@/db/drizzle";
 import { subscriptions } from "@/db/schema";
 
+const getSubscriptionPeriodEnd = (subscription: Stripe.Subscription) => {
+  const firstItem = subscription.items.data[0];
+
+  return firstItem?.current_period_end
+    ? new Date(firstItem.current_period_end * 1000)
+    : null;
+}
+
+const getSubscriptionPriceId = (subscription: Stripe.Subscription) => {
+  return subscription.items.data[0]?.price.id;
+}
+
+const upsertSubscription = async ({
+  subscription,
+  userId,
+}: {
+  subscription: Stripe.Subscription;
+  userId: string;
+}) => {
+  const priceId = getSubscriptionPriceId(subscription);
+
+  if (!priceId) {
+    throw new Error("订阅缺少价格信息");
+  }
+
+  const values = {
+    status: subscription.status,
+    userId,
+    subscriptionId: subscription.id,
+    customerId: subscription.customer as string,
+    priceId,
+    currentPeriodEnd: getSubscriptionPeriodEnd(subscription),
+    updatedAt: new Date(),
+  };
+
+  const [existingSubscription] = await db
+    .select()
+    .from(subscriptions)
+    .where(eq(subscriptions.subscriptionId, subscription.id));
+
+  if (existingSubscription) {
+    await db
+      .update(subscriptions)
+      .set(values)
+      .where(eq(subscriptions.subscriptionId, subscription.id));
+
+    return;
+  }
+
+  await db
+    .insert(subscriptions)
+    .values({
+      ...values,
+      createdAt: new Date(),
+    });
+}
+
 const app = new Hono()
   .post("/billing", verifyAuth(), async (c) => {
     const auth = c.get("authUser");
@@ -85,6 +142,11 @@ const app = new Hono()
         metadata: {
           userId: auth.token.id,
         },
+        subscription_data: {
+          metadata: {
+            userId: auth.token.id,
+          },
+        },
       });
     } catch (error) {
       console.error("[subscriptions.checkout]", error);
@@ -117,53 +179,48 @@ const app = new Hono()
         return c.json({ error: "无效签名" }, 400)
       }
 
-      //如果通过以上验证就说明是Stripe本身在尝试访问我们的服务器
-      const session = event.data.object as Stripe.Checkout.Session;
+      try {
+        if (event.type === "checkout.session.completed") {
+          const session = event.data.object as Stripe.Checkout.Session;
+          const userId = session.metadata?.userId;
+          const subscriptionId = session.subscription;
 
-      if (event.type === "checkout.session.completed") {
-        const subscription = await stripe.subscriptions.retrieve(
-          session.subscription as string,
-        );
+          if (!userId || typeof subscriptionId !== "string") {
+            return c.json({ error: "无效会话" }, 400);
+          }
 
-        if (!session?.metadata?.userId) {
-          return c.json({ error: "无效会话" }, 400);
+          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+
+          await upsertSubscription({ subscription, userId });
         }
 
-        await db
-          .insert(subscriptions)
-          .values({
-            status: subscription.status,
-            userId: session.metadata.userId,
-            subscriptionId: subscription.id,
-            customerId: subscription.customer as string,
-            priceId: subscription.items.data[0].price.product as string,
-            currentPeriodEnd: new Date(
-              subscription.current_period_end * 1000
-            ),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          });
-      }
+        if (event.type === "invoice.payment_succeeded") {
+          const invoice = event.data.object as Stripe.Invoice;
+          const subscriptionId = invoice.parent?.subscription_details?.subscription;
 
-      if (event.type === "invoice.payment_succeeded") {
-        const subscription = await stripe.subscriptions.retrieve(
-          session.subscription as string,
-        );
+          if (typeof subscriptionId !== "string") {
+            return c.json(null, 200);
+          }
 
-        if (!session?.metadata?.userId) {
-          return c.json({ error: "无效会话" }, 400);
+          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+          const userId = subscription.metadata.userId;
+
+          if (userId) {
+            await upsertSubscription({ subscription, userId });
+          } else {
+            await db
+              .update(subscriptions)
+              .set({
+                status: subscription.status,
+                currentPeriodEnd: getSubscriptionPeriodEnd(subscription),
+                updatedAt: new Date(),
+              })
+              .where(eq(subscriptions.subscriptionId, subscription.id));
+          }
         }
-
-        await db
-          .update(subscriptions)
-          .set({
-            status: subscription.status,
-            currentPeriodEnd: new Date(
-              subscription.current_period_end * 1000,
-            ),
-            updatedAt: new Date(),
-          })
-          .where(eq(subscriptions.id, subscription.id))
+      } catch (error) {
+        console.error("[subscriptions.webhook]", event.type, error);
+        return c.json({ error: "webhook处理失败" }, 500);
       }
 
       return c.json(null, 200);
